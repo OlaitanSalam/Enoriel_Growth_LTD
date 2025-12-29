@@ -1,0 +1,66 @@
+{% load car_tags %}
+
+<section class="py-10 {% cycle 'bg-white' 'bg-gray-50' %}">
+  <div class="max-w-7xl mx-auto px-4">
+    <!-- Professional Header -->
+    <div class="text-center mb-8">
+      <h3 class="text-2xl md:text-3xl font-bold text-primary mb-2">{{ title }}</h3>
+      {% if subtitle %}<p class="text-gray-600 max-w-2xl mx-auto">{{ subtitle }}</p>{% endif %}
+    </div>
+
+    <!-- Horizontal Scroll Container -->
+    <div class="relative">
+      <div class="overflow-x-auto pb-6 scrollbar-thin">
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 min-w-max md:min-w-0">
+          {% for car in cars|slice:":15" %}
+            <div class="w-56 md:w-full">
+              {% include 'cars/partials/car_card.html' with car=car %}
+            </div>
+          {% empty %}
+            <div class="col-span-full text-center py-8">
+              <div class="text-gray-400 mb-2">
+                <svg class="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                </svg>
+              </div>
+              <p class="text-gray-500">No vehicles available in this category</p>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <!-- View All Link -->
+    {% if view_all %}
+    <div class="text-center mt-6">
+      <a href="{% url 'car_list' %}{{ view_all }}" 
+         class="inline-flex items-center text-primary font-semibold hover:text-secondary transition-colors duration-200">
+        <span>View All {{ title }}</span>
+        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: #f1f5f9;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+</style>

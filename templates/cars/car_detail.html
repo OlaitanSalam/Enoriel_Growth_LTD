@@ -1,0 +1,579 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load car_tags %}
+
+{% block title %}{{ car.title }} - Enoriel Cars{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Custom Scrollbar for Thumbnails */
+.thumb-scroll::-webkit-scrollbar {
+    height: 6px;
+}
+.thumb-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+.thumb-scroll::-webkit-scrollbar-thumb {
+    background: #009CA6; /* Teal */
+    border-radius: 4px;
+}
+
+/* Glass effect for image overlay */
+.glass-badge {
+    background: rgba(0, 31, 63, 0.7);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+}
+
+/* Active Thumbnail Border */
+.thumb-active {
+    border-color: #009CA6 !important;
+    opacity: 1 !important;
+    transform: scale(1.05);
+}
+
+/* ======== CAR CARD FIXES ======== */
+
+/* For screens 640px and below */
+@media (max-width: 640px) {
+    /* Fix text breaking in car cards */
+    .car-card-modern .flex.items-center > span:not(:first-child) {
+        white-space: nowrap;
+        flex-shrink: 1;
+        min-width: 0;
+    }
+    
+    /* Reduce icon spacing on small screens */
+    .car-card-modern .space-x-1\.5 {
+        gap: 0.25rem;
+    }
+    
+    /* Adjust spec grid gap (FIXED: gap-x to gap/column-gap) */
+    .car-card-modern .grid {
+        gap: 0.375rem 0.75rem !important; /* row-gap column-gap */
+    }
+    
+    /* Similar cars wrapper adjustments */
+    .similar-cars-wrapper .grid {
+        gap: 0.5rem !important;
+    }
+    
+    .similar-cars-wrapper .car-card-modern {
+        min-width: 0;
+        overflow: hidden;
+    }
+    
+    .similar-cars-wrapper .text-\[11px\] {
+        font-size: 10px !important;
+    }
+    
+    .similar-cars-wrapper .h-10 {
+        height: 2.5rem !important;
+        overflow: hidden;
+    }
+}
+
+/* For screens 375px and below (iPhone X/12 mini) */
+@media (max-width: 375px) {
+    .car-card-modern .text-\[11px\] {
+        font-size: 10px;
+    }
+    
+    /* FIXED: gap-x to gap/column-gap */
+    .car-card-modern .grid {
+        gap: 0.375rem 0.5rem !important;
+    }
+    
+    .car-card-modern .w-4 {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+/* For iPhone 5/SE specifically (320px and below) */
+@media (max-width: 320px) {
+    .car-card-modern .text-\[11px\] {
+        font-size: 9px;
+    }
+    
+    .similar-cars-wrapper .grid {
+        gap: 0.25rem !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .similar-cars-wrapper .text-\[11px\] {
+        font-size: 9px !important;
+    }
+    
+    .similar-cars-wrapper .text-xl {
+        font-size: 1rem !important;
+    }
+    
+    .similar-cars-wrapper h3 {
+        font-size: 0.8rem !important;
+        line-height: 1.1;
+    }
+}
+
+/* For screens between 321px and 360px */
+@media (min-width: 321px) and (max-width: 360px) {
+    .similar-cars-wrapper .grid {
+        gap: 0.25rem !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    
+    .similar-cars-wrapper .text-\[11px\] {
+        font-size: 9px !important;
+    }
+    
+    .similar-cars-wrapper .text-xl {
+        font-size: 1rem !important;
+    }
+    
+    .similar-cars-wrapper h3 {
+        font-size: 0.8rem !important;
+        line-height: 1.1;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen pb-12">
+    
+    <div class="bg-white border-b border-gray-200 shadow-sm sticky top-[60px] md:top-[80px] z-30">
+        <div class="container mx-auto px-4 py-4">
+            <nav class="text-xs md:text-sm text-gray-500 mb-2">
+                <a href="{% url 'home' %}" class="hover:text-teal">Home</a> 
+                <span class="mx-1">/</span>
+                <a href="{% url 'car_list' %}" class="hover:text-teal">Autos</a>
+                <span class="mx-1">/</span>
+                <span class="text-gray-900 font-medium truncate">{{ car.title }}</span>
+            </nav>
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-2">
+                <div>
+                    <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-primary font-poppins leading-tight">
+
+                        {{ car.title }}
+                    </h1>
+                    <div class="flex items-center gap-3 mt-1 text-sm text-gray-600">
+                        <span class="flex items-center gap-1"><i class="fas fa-map-marker-alt text-teal"></i> {{ car.location|default:"Lagos, Nigeria" }}</span>
+                        <span class="hidden md:inline text-gray-300">|</span>
+                        <span class="bg-gray-100 px-2 py-0.5 rounded text-xs font-semibold uppercase tracking-wide border border-gray-200">{{ car.condition|condition_display }}</span>
+                    </div>
+                </div>
+                <div class="text-xl sm:text-2xl md:text-3xl font-extrabold text-teal">
+
+                    {{ car.price|format_naira }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-4 py-6">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <div class="lg:col-span-8 space-y-8">
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="relative w-full aspect-video bg-gray-900 group overflow-hidden">
+                        
+                        <img id="main-image-bg" 
+                             src="{% if car.main_image %}{{ car.main_image.image.url }}{% endif %}" 
+                             class="absolute inset-0 w-full h-full object-cover opacity-40 blur-lg scale-110 transition-transform duration-700"
+                             alt="Background Blur">
+                        
+                        <img id="main-image" 
+                             src="{% if car.main_image %}{{ car.main_image.image.url }}{% else %}{% static 'images/placeholder.png' %}{% endif %}" 
+                             class="relative z-10 w-full h-full object-contain transition-all duration-300"
+                             alt="{{ car.title }}">
+
+                        <div class="absolute top-4 left-4 z-20 flex flex-col gap-2">
+                            {% if car.featured %}
+                            <span class="px-3 py-1 bg-gradient-to-r from-secondary to-orange-500 text-white text-xs font-bold rounded-full shadow-lg">
+                                🔥 Sweet Deal
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <div class="absolute bottom-4 right-4 z-20 glass-badge px-3 py-1 rounded-full text-white text-xs font-medium">
+                            <i class="fas fa-camera mr-1"></i> <span id="image-count">1</span> / {{ car.images.count }}
+                        </div>
+                    </div>
+
+                    {% if car.images.count > 1 %}
+                    <div class="p-4 bg-white border-t border-gray-100">
+                        <div class="flex space-x-3 overflow-x-auto thumb-scroll pb-2">
+                            {% for image in car.images.all %}
+                                <button onclick="updateGallery(this, '{{ image.image.url }}')"
+                                        class="relative flex-shrink-0 w-20 h-16 rounded-lg overflow-hidden border-2 border-transparent transition-all duration-200 opacity-70 hover:opacity-100 {% if forloop.first %}thumb-active{% endif %}">
+                                    <img src="{{ image.image.url }}" class="w-full h-full object-cover" alt="Thumbnail">
+                                </button>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                    <h2 class="text-base sm:text-lg font-bold text-primary mb-6 flex items-center gap-2">
+
+                        <span class="w-1 h-6 bg-teal rounded-full"></span>
+                        Key Specifications
+                    </h2>
+                    
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <div class="p-4 bg-gray-50 rounded-xl flex flex-col items-center justify-center text-center hover:bg-teal/5 transition duration-300 border border-transparent hover:border-teal/20">
+                            <i class="fas fa-calendar-alt text-teal text-xl mb-2"></i>
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Year</span>
+                            <span class="text-gray-900 font-bold mt-1">{{ car.year }}</span>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 rounded-xl flex flex-col items-center justify-center text-center hover:bg-teal/5 transition duration-300 border border-transparent hover:border-teal/20">
+                            <i class="fa-solid fa-road text-teal text-xl mb-2"></i>
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Mileage</span>
+                            <span class="text-gray-900 font-bold mt-1">{{ car.mileage|format_mileage|default:"N/A" }}</span>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 rounded-xl flex flex-col items-center justify-center text-center hover:bg-teal/5 transition duration-300 border border-transparent hover:border-teal/20">
+                            <i class="fas fa-cog text-teal text-xl mb-2"></i>
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Transmission</span>
+                            <span class="text-gray-900 font-bold mt-1">{{ car.get_transmission_display }}</span>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 rounded-xl flex flex-col items-center justify-center text-center hover:bg-teal/5 transition duration-300 border border-transparent hover:border-teal/20">
+                            <i class="fas fa-gas-pump text-teal text-xl mb-2"></i>
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Fuel Type</span>
+                            <span class="text-gray-900 font-bold mt-1">{{ car.get_fuel_type_display }}</span>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 rounded-xl flex flex-col items-center justify-center text-center hover:bg-teal/5 transition duration-300 border border-transparent hover:border-teal/20">
+                            <i class="fas fa-palette text-teal text-xl mb-2"></i>
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Color</span>
+                            <span class="text-gray-900 font-bold mt-1">{{ car.color|default:"Standard" }}</span>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 rounded-xl flex flex-col items-center justify-center text-center hover:bg-teal/5 transition duration-300 border border-transparent hover:border-teal/20">
+                            <i class="fas fa-car text-teal text-xl mb-2"></i>
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Category</span>
+                            <span class="text-gray-900 font-bold mt-1">{{ car.category.name|default:"Sedan" }}</span>
+                        </div>
+
+                         <div class="p-4 bg-gray-50 rounded-xl flex flex-col items-center justify-center text-center hover:bg-teal/5 transition duration-300 border border-transparent hover:border-teal/20">
+                            <i class="fas fa-cogs text-teal text-xl mb-2"></i>
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Engine</span>
+                            <span class="text-gray-900 font-bold mt-1">{{ car.engine_type|default:"V6" }}</span>
+                        </div>
+
+                        <div class="p-4 bg-gray-50 rounded-xl flex flex-col items-center justify-center text-center hover:bg-teal/5 transition duration-300 border border-transparent hover:border-teal/20">
+                            <i class="fas fa-couch text-teal text-xl mb-2"></i>
+                            <span class="text-xs text-gray-500 uppercase tracking-wider font-medium">Interior</span>
+                            <span class="text-gray-900 font-bold mt-1">{{ car.car_interior|default:"Leather" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-8 border-t border-gray-100">
+                        <h3 class="text-lg font-bold text-primary mb-3">Vehicle Overview</h3>
+                        <div class="prose prose-sm md:prose-base text-gray-600 leading-relaxed">
+                            {{ car.description|linebreaks }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="lg:col-span-4 space-y-6">
+
+                <!-- Booking Journey Section -->
+<div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 mb-6">
+
+    <div class="text-center mb-4">
+        <h3 class="text-2xl font-bold mb-2">🎁 Start Your Booking Journey!</h3>
+        <p class="text-gray-600 text-sm">Book online and get a <span class="font-semibold text-teal">FREE 5 litres of Engine Oil</span></p>
+
+    </div>
+    
+    <!-- Progress Steps Preview -->
+    <div class="bg-gray-50 rounded-xl p-4 mb-4 border border-gray-100">
+
+        <div class="space-y-2 text-sm">
+            <div class="flex items-center space-x-2">
+                <span class="flex-shrink-0 w-6 h-6 bg-white text-teal rounded-full flex items-center justify-center text-xs font-bold">1</span>
+                <span>Schedule Inspection</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="flex-shrink-0 w-6 h-6 bg-white/30 text-teal rounded-full flex items-center justify-center text-xs font-bold">2</span>
+                <span>Negotiate Price in App</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="flex-shrink-0 w-6 h-6 bg-white/30 text-teal rounded-full flex items-center justify-center text-xs font-bold">3</span>
+                <span>Schedule Payment</span>
+            </div>
+            <div class="flex items-center space-x-2">
+                <span class="flex-shrink-0 w-6 h-6 bg-white/30 text-teal rounded-full flex items-center justify-center text-xs font-bold">4</span>
+                <span>Get FREE Gift! 🎁</span>
+            </div>
+        </div>
+    </div>
+    
+    <button onclick="showBookingForm()" 
+            class="w-full bg-white text-teal py-4 rounded-xl font-bold hover:bg-gray-50 transition shadow-lg flex items-center justify-center space-x-2">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+        </svg>
+        <span>Start Booking Now</span>
+    </button>
+    
+    <p class="text-center text-xs text-white/80 mt-3">
+        ✓ No payment needed now • Track everything in-app • Negotiate price online
+    </p>
+</div>
+
+<!-- Booking Form Modal (Hidden by default) -->
+<div id="bookingFormModal" class="hidden fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4" onclick="if(event.target === this) hideBookingForm()">
+    <div class="bg-white rounded-2xl max-w-md w-full p-6 relative max-h-[90vh] overflow-y-auto">
+        <button type="button" onclick="hideBookingForm()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+        </button>
+        
+        <h3 class="text-2xl font-bold text-primary mb-4">Start Your Booking</h3>
+        <p class="text-gray-600 mb-6">Fill in your details to begin. No payment required now!</p>
+        
+        <form method="POST" action="{% url 'create_booking_from_inquiry' %}" onsubmit="return handleBookingSubmit(event)">
+            {% csrf_token %}
+            <input type="hidden" name="car_id" value="{{ car.id }}">
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Full Name *</label>
+                    <input type="text" name="name" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent"
+                           placeholder="Your full name">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Phone Number *</label>
+                    <input type="tel" name="phone" required
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent"
+                           placeholder="+234 XXX XXX XXXX">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Email (Optional)</label>
+                    <input type="email" name="email"
+                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent"
+                           placeholder="your.email@example.com">
+                </div>
+                
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Initial Message (Optional)</label>
+                    <textarea name="message" rows="3"
+                              class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent"
+                              placeholder="Any questions or special requests?"></textarea>
+                </div>
+                
+                <div class="bg-green-50 border-l-4 border-green-500 p-4 rounded">
+                    <p class="text-sm text-green-800">
+                        <strong>What's Next?</strong> After booking, you can:
+                        <br>• Schedule inspection
+                        <br>• Negotiate price in-app
+                        <br>• Track progress in real-time
+                        <br>• Chat with us anytime
+                    </p>
+                </div>
+                
+                <button type="submit" id="bookingSubmitBtn"
+                        class="w-full bg-gradient-to-r from-teal to-green-600 hover:from-teal-600 hover:to-green-700 text-white py-4 rounded-lg font-bold transition shadow-lg">
+                    🚀 Start My Booking Journey
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+                <div class="bg-white rounded-2xl shadow-lg border border-gray-100 p-6 sticky top-24">
+                    <div class="text-center mb-6">
+                        <div class="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <img src="{% static 'images/Enoriel_logo2.png' %}" class="w-23 h-23 object-contain" alt="Logo">
+                        </div>
+                        <h3 class="font-bold text-lg text-primary">Enoriel Growth Ltd</h3>
+                        <div class="flex items-center justify-center gap-1 text-sm text-yellow-500 mt-1">
+                            <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                            <span class="text-gray-400 text-xs ml-1">(Verified Seller)</span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-3">
+                        <a href="https://wa.me/+2347077287755?text=Hi, I am interested in the {{ car.year }} {{ car.make }} {{ car.model }} listed for {{ car.price|format_naira }}" 
+                           target="_blank"
+                           class="flex items-center justify-center w-full py-3.5 bg-[#25D366] hover:bg-[#128C7E] text-white rounded-xl font-bold transition shadow-md group">
+                            <i class="fab fa-whatsapp text-xl mr-2 group-hover:scale-110 transition-transform"></i>
+                            WhatsApp
+                        </a>
+
+                        <a href="tel:+2347077287755" 
+                           class="flex items-center justify-center w-full py-3.5 bg-primary hover:bg-accent text-white rounded-xl font-bold transition shadow-md group">
+                            <i class="fas fa-phone-alt text-lg mr-2 group-hover:rotate-12 transition-transform"></i>
+                            Call Seller
+                        </a>
+                        
+                        <button id="inquiry-toggle"
+                           class="flex items-center justify-center w-full py-3.5 border-2 border-gray-200 hover:border-primary text-gray-700 hover:text-primary rounded-xl font-bold transition bg-transparent">
+                            <i class="fas fa-envelope text-lg mr-2"></i>
+                            Send Message
+                        </button>
+                    </div>
+
+                    <div id="inquiry-box" class="hidden mt-6 pt-4 border-t border-gray-100 animate-fade-in-down">
+                        <form method="post" class="space-y-3">
+                            {% csrf_token %}
+                            {{ inquiry_form.non_field_errors }}
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase">Your Name</label>
+                                {{ inquiry_form.name }} 
+                                </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase">Email</label>
+                                {{ inquiry_form.email }}
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase">Phone</label>
+                                {{ inquiry_form.phone }} 
+                                </div>
+                            <div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-500 uppercase">Message</label>
+                                {{ inquiry_form.message }}
+                            </div>
+                            <button type="submit" class="w-full bg-teal hover:bg-teal-600 text-white py-3 rounded-lg font-bold text-sm">
+                                Submit Inquiry
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="mt-6 pt-4 border-t border-gray-100">
+                        <p class="text-center text-xs text-gray-400 mb-2">Share this vehicle</p>
+                        {% with request.build_absolute_uri as share_url %}
+<div class="flex justify-center gap-3">
+
+    <!-- Facebook -->
+    <a href="https://www.facebook.com/sharer/sharer.php?u={{ share_url }}"
+       target="_blank"
+       class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center hover:bg-blue-600 hover:text-white transition">
+        <i class="fab fa-facebook-f"></i>
+    </a>
+
+    <!-- Twitter/X -->
+    <a href="https://twitter.com/intent/tweet?url={{ share_url }}&text=Check out this car on Enoriel Cars!"
+       target="_blank"
+       class="w-8 h-8 rounded-full bg-black/10 text-black flex items-center justify-center hover:bg-black hover:text-white transition">
+        <i class="fa-brands fa-x-twitter"></i>
+    </a>
+
+    <!-- WhatsApp -->
+    <a href="https://wa.me/?text=Check out this car on Enoriel Cars: {{ share_url }}"
+       target="_blank"
+       class="w-8 h-8 rounded-full bg-green-100 text-green-600 flex items-center justify-center hover:bg-green-600 hover:text-white transition">
+        <i class="fab fa-whatsapp"></i>
+    </a>
+
+</div>
+{% endwith %}
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if related_cars %}
+        <div class="mt-16">
+            <div class="flex items-center justify-between mb-6 whitespace-nowrap flex-nowrap gap-4">
+
+                <h2 class="text-xl sm:text-2xl font-bold text-primary font-poppins">Similar Cars</h2>
+                <a href="{% url 'car_list' %}" class="text-teal hover:text-teal-600 text-sm font-semibold flex items-center">
+                    View All <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            <div class="similar-cars-wrapper text-[13px] sm:text-base">
+           <div class="grid gap-4 md:gap-6 grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-[repeat(auto-fill,minmax(220px,1fr))]">
+                {% for related_car in related_cars %}
+                    {% include 'cars/partials/car_card.html' with car=related_car %}
+                {% endfor %}
+            </div>
+            </div>
+
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // 1. Image Gallery Logic
+    function updateGallery(element, imageUrl) {
+    const mainImg = document.getElementById('main-image');
+    const bgImg = document.getElementById('main-image-bg');
+    const imageCount = document.getElementById('image-count');
+
+    // FADE EFFECT
+    mainImg.style.opacity = '0.8';
+
+    setTimeout(() => {
+        mainImg.src = imageUrl;
+        bgImg.src = imageUrl;
+        mainImg.style.opacity = '1';
+    }, 150);
+
+    // UPDATE ACTIVE THUMBNAIL
+    document.querySelectorAll('.thumb-active').forEach(el => {
+        el.classList.remove('thumb-active');
+    });
+    element.classList.add('thumb-active');
+
+    // UPDATE IMAGE INDEX
+    const thumbnails = Array.from(document.querySelectorAll(".thumb-scroll button"));
+    const index = thumbnails.indexOf(element) + 1;
+    imageCount.textContent = index;
+    }
+
+
+    // 2. Inquiry Toggle Logic
+    const toggleBtn = document.getElementById('inquiry-toggle');
+    const inquiryBox = document.getElementById('inquiry-box');
+
+    if(toggleBtn && inquiryBox) {
+        toggleBtn.addEventListener('click', () => {
+            if (inquiryBox.classList.contains('hidden')) {
+                inquiryBox.classList.remove('hidden');
+                toggleBtn.classList.add('bg-gray-50', 'text-primary');
+                toggleBtn.classList.remove('bg-transparent', 'text-gray-700');
+            } else {
+                inquiryBox.classList.add('hidden');
+                toggleBtn.classList.remove('bg-gray-50', 'text-primary');
+                toggleBtn.classList.add('bg-transparent', 'text-gray-700');
+            }
+        });
+    }
+</script>
+<script>
+function showBookingForm() {
+    document.getElementById('bookingFormModal').classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+}
+
+function hideBookingForm() {
+    document.getElementById('bookingFormModal').classList.add('hidden');
+    document.body.style.overflow = 'auto';
+}
+
+function handleBookingSubmit(event) {
+    const btn = document.getElementById('bookingSubmitBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<svg class="animate-spin h-5 w-5 mx-auto" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>';
+    return true; // Allow form to submit
+}
+</script>
+{% endblock %}

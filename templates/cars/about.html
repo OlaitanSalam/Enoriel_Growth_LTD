@@ -1,0 +1,692 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}About Enoriel Growth Ltd | Trusted Automotive Sourcing from US & Canada{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Fix horizontal scroll at the top of extra_css block */
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
+}
+
+.container, .mx-auto {
+    max-width: 100%;
+}
+
+.about-hero, .section-padding {
+    width: 100%;
+    max-width: 100%;
+}
+
+.stats-grid, .stat-item, .value-card, .process-timeline, .timeline-item {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+
+    
+    /* Hero Section with Image */
+    .about-hero {
+        position: relative;
+        min-height: 85vh;
+        background: linear-gradient(135deg, #001F3F 0%, #03315C 50%, #001F3F 100%);
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        margin-top: calc(-1 * var(--nav-height));
+    }
+    
+    .hero-background-image {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.6;
+        z-index: 1;
+    }
+    
+    /* Gradient overlay for better text readability */
+    .hero-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to right, rgba(0, 31, 63, 0.9) 0%, rgba(0, 31, 63, 0.7) 50%, rgba(0, 31, 63, 0.9) 100%);
+        z-index: 2;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 3;
+    }
+    
+    /* Section Spacing */
+    .section-padding {
+        padding: 5rem 0;
+    }
+    
+    /* Company Stats */
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+    
+    @media (min-width: 768px) {
+        .stats-grid {
+            grid-template-columns: repeat(4, 1fr);
+        }
+    }
+    
+    .stat-item {
+        text-align: center;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Values Cards - Matching Homepage Style */
+    .value-card {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 2.5rem;
+        transition: all 0.5s ease;
+        height: 100%;
+    }
+    
+    .value-card:hover {
+        transform: translateY(-8px);
+        border-color: rgba(0, 156, 166, 0.4);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+    }
+    
+    .value-icon-wrapper {
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    /* Process Timeline */
+    .process-timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+    
+    .process-timeline::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background: linear-gradient(to bottom, #009CA6, #4ADE58);
+    }
+    
+    .timeline-item {
+        position: relative;
+        margin-bottom: 2.5rem;
+        padding-left: 2rem;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: -2.4rem;
+        top: 0.5rem;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #009CA6;
+        border: 3px solid white;
+        box-shadow: 0 0 0 3px rgba(0, 156, 166, 0.3);
+    }
+    
+    /* CTA Section - Matching Homepage */
+    .about-cta {
+        background: linear-gradient(135deg, #07131F 0%, #0A2233 50%, #063B36 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .cta-pattern {
+        position: absolute;
+        inset: 0;
+        opacity: 0.05;
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Ccircle fill='%23FFFFFF' cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E");
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .about-hero {
+            min-height: 70vh;
+        }
+        
+        .section-padding {
+            padding: 3rem 0;
+        }
+        
+        .value-card {
+            padding: 1.5rem;
+        }
+    }
+
+    /* Faster AOS on mobile */
+@media (max-width: 768px) {
+    [data-aos] {
+        transition-delay: 0s !important;
+    }
+    
+    /* Faster delays for stats specifically */
+    .stats-grid [data-aos] {
+        transition-delay: 0s !important;
+    }
+    
+    /* Faster hero animations */
+    .hero-content [data-aos] {
+        transition-delay: 0s !important;
+    }
+}
+
+/* CTA Section - White background */
+.about-cta {
+    background: #ffffff !important; /* Force white background */
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+/* Update pattern for white background */
+.cta-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Ccircle fill='%23000' cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Founders section */
+.founder-section {
+    background: white !important;
+    position: relative;
+}
+
+.founder-image-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    min-height: 400px;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.founder-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; 
+    border-radius: 16px;
+}
+
+.founder-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0, 31, 63, 0.9), transparent);
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+}
+
+.founder-name {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.founder-title {
+    color: #009CA6;
+    font-size: 1rem;
+    font-weight: 600;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+/* Responsive adjustments for the image */
+@media (max-width: 768px) {
+    .founder-image-container {
+        min-height: 350px;
+        margin-bottom: 2rem;
+    }
+    
+    .founder-overlay {
+        padding: 1.5rem;
+    }
+    
+    .founder-name {
+        font-size: 1.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .founder-image-container {
+        min-height: 300px;
+    }
+    
+    .founder-overlay {
+        padding: 1rem;
+    }
+}
+
+/* For large screens */
+@media (min-width: 1024px) {
+    .founder-image-container {
+        min-height: 500px;
+    }
+}
+
+/* Ensure text sections maintain readability */
+.founder-text-content {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.founder-text-content p {
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.founder-text-content p:last-child {
+    margin-bottom: 0;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section with Image -->
+<section class="about-hero">
+    <!-- Hero Background Image -->
+    <img src="{% static 'images/about_us_hero.avif' %}" 
+         alt="Modern automotive warehouse with luxury cars"
+         class="hero-background-image">
+    
+    <div class="hero-overlay"></div>
+    
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="hero-content max-w-4xl mx-auto text-center py-20 md:py-28">
+            <div data-aos="fade-up">
+                
+                <!-- Main Heading -->
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-6 leading-tight">
+                    Simplifying Global Trade
+                    <span class="block mt-2 bg-gradient-to-r from-teal to-lime_green bg-clip-text text-transparent">
+                        From USA & Canada to You
+                    </span>
+                </h1>
+                
+                <!-- Subheading -->
+                <p class="text-xl text-gray-200 mb-8 max-w-3xl mx-auto leading-relaxed">
+                    We are a forward-thinking trade sourcing and business development company dedicated to making global commerce simple, reliable, and accessible.
+                </p>
+                
+                <!-- Stats -->
+                <div class="stats-grid">
+                    <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                        <div class="text-3xl font-bold text-teal mb-2">500+</div>
+                        <div class="text-sm text-gray-300">Satisfied Clients</div>
+                    </div>
+                    <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                        <div class="text-3xl font-bold text-teal mb-2">100%</div>
+                        <div class="text-sm text-gray-300">Quality Verified</div>
+                    </div>
+                    <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                        <div class="text-3xl font-bold text-teal mb-2">2</div>
+                        <div class="text-sm text-gray-300">Continents Served</div>
+                    </div>
+                    <div class="stat-item" data-aos="fade-up" data-aos-delay="400">
+                        <div class="text-3xl font-bold text-teal mb-2">24/7</div>
+                        <div class="text-sm text-gray-300">Client Support</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Who We Are Section -->
+<section class="section-padding bg-gray-50">
+    <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div data-aos="fade-right">
+                    <span class="inline-flex items-center px-4 py-2 rounded-full bg-teal/10 text-teal text-sm font-semibold tracking-wide uppercase mb-6">
+                        About Us
+                    </span>
+                    
+                    <h2 class="text-3xl md:text-4xl font-bold text-primary mb-6">
+                        About Enoriel Growth Limited
+                    </h2>
+                    
+                    <div class="space-y-4 text-gray-600">
+                        <p>
+                            Enoriel Growth Limited is an automotive importation and trading company focused on high-turnover, high-demand Toyota Corolla vehicles, delivering predictable margins through disciplined execution and transparent operations.
+                        </p>
+                        <p>
+                            The company operates a fully integrated, end-to-end vehicle importation and sales model, managing the entire value chain—from vehicle sourcing in Canada to final sale in Nigeria.
+                        </p>
+                        <p>
+                            Our operating philosophy emphasizes capital efficiency, margin protection, risk management, and execution discipline, enabling repeatable performance and sustainable growth.
+                        </p>
+                    </div>
+                </div>
+                
+                <div data-aos="fade-left" data-aos-delay="200">
+                    <div class="bg-white rounded-2xl shadow-xl p-8 border border-gray-200">
+                        <h3 class="text-2xl font-bold text-primary mb-6 flex items-center gap-3">
+                            <div class="w-2 h-8 bg-teal rounded-full"></div>
+                            Operating Strengths
+                        </h3>
+                        
+                        <div class="space-y-6">
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-teal/10 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-1">Proven Market Focus</h4>
+                                    <p class="text-gray-600 text-sm">Concentration on Toyota Corolla models with consistent demand and strong resale performance in Nigeria.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-secondary/10 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-1">Capital Efficiency</h4>
+                                    <p class="text-gray-600 text-sm">Fast inventory turnover enables continuous capital recycling and stable cash flows.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-lime_green/10 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-lime_green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-1">Risk Management</h4>
+                                    <p class="text-gray-600 text-sm">Comprehensive insurance, verified counterparties, conservative pricing assumptions, and contingency buffers.</p>
+                                </div>
+                            </div>
+                            
+                            <div class="flex items-start gap-4">
+                                <div class="flex-shrink-0 w-12 h-12 rounded-xl bg-cyan-300/10 flex items-center justify-center">
+                                    <svg class="w-6 h-6 text-cyan-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-gray-900 mb-1">Transparency & Governance</h4>
+                                    <p class="text-gray-600 text-sm">Detailed cost analysis, clear profit projections, structured repayment planning, and full transaction documentation.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Founder's Story - White Background -->
+<section class="section-padding founder-section">
+    <div class="container mx-auto px-4">
+        <!-- Header -->
+        <div class="text-center mb-16" data-aos="fade-up">
+            <span class="inline-flex items-center px-5 py-2 rounded-full bg-teal/10 text-teal text-sm font-semibold tracking-wide uppercase mb-6">
+                Our Founder
+            </span>
+            
+            <h2 class="text-4xl md:text-5xl font-extrabold text-primary mb-4">
+                The Visionary Leader
+            </h2>
+            
+            <p class="text-lg text-gray-600 max-w-3xl mx-auto">
+                Driving excellence through hands-on leadership and strategic execution
+            </p>
+        </div>
+        
+        <!-- Founder Content - 2 Column Grid -->
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
+                <!-- Founder Image with Name Overlay -->
+                <div class="founder-image-container" data-aos="fade-right">
+                    <img src="{% static 'images/founder3.webp' %}" 
+                         alt="Ololade Eniola Adeosun"
+                         class="founder-portrait">
+                    
+                    <!-- Name and Title Overlay -->
+                    <div class="founder-overlay">
+                        <div class="founder-name">Ololade Eniola Adeosun</div>
+                        <div class="founder-title">Founder & CEO</div>
+                    </div>
+                </div>
+                
+                <!-- Founder Story -->
+                <div class="founder-text-content" data-aos="fade-left" data-aos-delay="200">
+                    <div class="space-y-6 text-gray-700">
+                        <p>
+                            Enoriel Growth Limited was co-founded by Ololade Eniola Adeosun, a results-driven business leader with deep, hands-on experience in sales execution, customer engagement, revenue development, and operational management.
+                        </p>
+                        
+                        <p>
+                            Her professional background spans building and managing sales pipelines, negotiating and closing commercial transactions, strengthening customer relationships, and driving revenue growth across competitive markets.
+                        </p>
+                        
+                        <p>
+                            Ololade brings a practical, execution-first leadership approach, combining strong commercial intuition with data-driven decision-making to ensure that strategy is consistently translated into results.
+                        </p>
+                        
+                        <p>
+                            She is deeply involved in the day-to-day operations of the business, overseeing vehicle selection decisions, partner coordination, sales execution, cash collection, and reinvestment cycles.
+                        </p>
+                        
+                        <p>
+                            Guided by integrity, accountability, and a strong understanding of market dynamics, she founded Enoriel Growth Limited to operate a disciplined, transparent, and scalable trading model that delivers consistent value to partners and stakeholders.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- What We Do Section -->
+<section class="section-padding bg-white">
+    <div class="container mx-auto px-4">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div data-aos="fade-right">
+                    <h2 class="text-3xl md:text-4xl font-bold text-primary mb-8">
+                        What We Do
+                    </h2>
+                    
+                    <div class="process-timeline">
+                        <div class="timeline-item" data-aos="fade-up" data-aos-delay="100">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Vehicle Sourcing & Selection</h3>
+                            <p class="text-gray-600">
+                                We identify and verify quality Toyota Corolla and other vehicles from trusted Canadian dealers, focusing on models with proven resale demand, competitive pricing, and strong margin potential.
+                            </p>
+                        </div>
+                        
+                        <div class="timeline-item" data-aos="fade-up" data-aos-delay="200">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Purchase Execution & Export Documentation</h3>
+                            <p class="text-gray-600">
+                                We manage vehicle purchases, confirm titles and ownership, and coordinate all export and shipping documentation in collaboration with verified logistics partners.
+                            </p>
+                        </div>
+                        
+                        <div class="timeline-item" data-aos="fade-up" data-aos-delay="300">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">International Shipping & Insurance</h3>
+                            <p class="text-gray-600">
+                                We oversee ocean freight from Canada to Nigeria, including shipment tracking and comprehensive insurance coverage to protect capital during transit.
+                            </p>
+                        </div>
+                        
+                        <div class="timeline-item" data-aos="fade-up" data-aos-delay="400">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Customs Clearing & Regulatory Compliance</h3>
+                            <p class="text-gray-600">
+                                We handle customs processing, duty payments, and regulatory requirements through vetted clearing agents to ensure compliance and smooth clearance.
+                            </p>
+                        </div>
+                        
+                        <div class="timeline-item" data-aos="fade-up" data-aos-delay="500">
+                            <h3 class="text-xl font-bold text-gray-900 mb-2">Local Distribution, Marketing & Sales</h3>
+                            <p class="text-gray-600">
+                                Vehicles are transported to Lagos, marketed through established dealer networks, sold efficiently, and converted to cash to complete each operating cycle.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div data-aos="fade-left" data-aos-delay="200">
+                    <div class="bg-gray-50 rounded-2xl p-8 h-full">
+                        <h3 class="text-2xl font-bold text-primary mb-6">Our Philosophy</h3>
+                        
+                        <div class="space-y-6 text-gray-600">
+                            <p>
+                                At Enoriel Growth Limited, we believe sustainable success is built on clarity of strategy, disciplined execution, and transparent operations.
+                            </p>
+                            
+                            <p>
+                                We operate a repeatable, data-driven vehicle importation model designed to deliver consistent returns, manage downside risk, and create long-term value for our partners and stakeholders.
+                            </p>
+                            
+                            <div class="pt-6 mt-6 border-t border-gray-200">
+                                <p class="text-lg font-semibold text-primary">
+                                    Our operations are structured around a repeatable and tightly controlled process, designed to minimize risk and maximize capital efficiency.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Additional note -->
+                        <div class="mt-8 p-4 bg-teal/5 rounded-lg border-l-4 border-teal">
+                            <p class="text-sm text-gray-700">
+                                Every aspect of our business—from vehicle selection to final sale—is governed by principles of capital efficiency, margin protection, and risk management.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section - White background -->
+<section class="about-cta py-20 pt-0 relative overflow-hidden">
+    <div class="cta-pattern"></div>
+    
+    <!-- Background elements -->
+    <div class="absolute -top-24 -right-24 w-48 h-48 bg-teal/10 rounded-full"></div>
+    <div class="absolute -bottom-32 -left-32 w-64 h-64 bg-secondary/10 rounded-full"></div>
+    
+    <div class="container mx-auto px-4 text-center relative z-10">
+        <div data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-6">
+                <span class="block text-primary">Ready to Experience</span>
+                <span class="block mt-2 bg-gradient-to-r from-teal to-lime_green bg-clip-text text-transparent">
+                    Simplified Global Trade?
+                </span>
+            </h2>
+            
+            <p class="text-xl text-gray-600 max-w-3xl mx-auto mb-12 leading-relaxed">
+                Join hundreds of satisfied clients who trust Enoriel Growth Limited for transparent, reliable automotive sourcing from North America.
+            </p>
+            
+            <!-- Action Buttons -->
+            <div class="flex flex-col sm:flex-row gap-5 justify-center items-center">
+                <!-- Primary Button -->
+                <a href="{% url 'car_list' %}"
+                   class="group relative px-10 py-5 rounded-xl bg-gradient-to-r from-teal to-secondary text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 min-w-[200px] flex items-center justify-center">
+                    <span>Browse Our Cars</span>
+                    <svg class="w-5 h-5 ml-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/>
+                    </svg>
+                    
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-secondary to-teal opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                </a>
+                
+                <!-- WhatsApp Button -->
+                <a href="https://wa.me/+2347077287755" target="_blank" rel="noopener noreferrer"
+                   class="group relative px-10 py-5 rounded-xl bg-gradient-to-r from-green-500 to-green-600 text-white font-semibold transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 min-w-[200px] flex items-center justify-center">
+                    <svg class="w-5 h-5 mr-3" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893A11.821 11.821 0 0020.463 3.09"/>
+                    </svg>
+                    <span>Chat on WhatsApp</span>
+                    
+                    <div class="absolute inset-0 rounded-xl bg-gradient-to-r from-green-600 to-green-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300 -z-10"></div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // AOS initialization for mobile compatibility
+        if (typeof AOS !== 'undefined') {
+            AOS.init({
+                duration: 800, // Faster duration
+                offset: 80, // Trigger earlier
+                delay: 100, // Base delay (will be overridden on mobile)
+                once: true,
+                mirror: false,
+                disable: function() {
+                    // On mobile, override all delays to 0
+                    if (window.innerWidth < 768) {
+                        document.querySelectorAll('[data-aos-delay]').forEach(function(el) {
+                            el.setAttribute('data-aos-delay', '0');
+                        });
+                    }
+                    return false; // Enable on all devices
+                }
+            });
+        }
+        
+        // Optional: Fix for iOS Safari 100vh issue
+        function setVH() {
+            let vh = window.innerHeight * 0.01;
+            document.documentElement.style.setProperty('--vh', `${vh}px`);
+        }
+        
+        setVH();
+        window.addEventListener('resize', setVH);
+        window.addEventListener('orientationchange', setVH);
+    });
+</script>
+{% endblock %}

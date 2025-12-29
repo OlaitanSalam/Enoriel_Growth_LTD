@@ -1,0 +1,56 @@
+<!-- templates/cars/partials/car_card_home.html -->
+<div class="group flex-none w-72 md:w-80 bg-white rounded-2xl shadow-md hover:shadow-2xl transition-all duration-300 overflow-hidden border border-gray-100">
+    <a href="{{ car.get_absolute_url }}" class="block">
+        <!-- Image -->
+        <div class="aspect-[4/3] relative overflow-hidden bg-gray-100">
+            {% if car.prefetched_image %}
+                <img src="{{ car.prefetched_image.image.url }}"
+                     alt="{{ car.title }}"
+                     class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
+            {% else %}
+                <div class="w-full h-full bg-gray-200 flex items-center justify-center">
+                    <span class="text-gray-400 text-sm">No image</span>
+                </div>
+            {% endif %}
+
+            <!-- Condition Badge -->
+            {% if car.condition == 'new' %}
+                <div class="absolute top-3 left-3 bg-emerald-500 text-white px-3 py-1 rounded-full text-xs font-bold text-white shadow-lg">
+                    BRAND NEW
+                </div>
+            {% elif car.condition == 'foreign_used' %}
+                <div class="absolute top-3 left-3 bg-blue-600 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                    TOKUNBO
+                </div>
+            {% elif car.condition == 'local_used' %}
+                <div class="absolute top-3 left-3 bg-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                    NIGERIAN USED
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Details -->
+        <div class="p-5">
+            <h3 class="font-bold text-lg text-gray-900 line-clamp-1">
+                {{ car.year }} {{ car.make }} {{ car.model }}
+            </h3>
+
+            <p class="text-2xl font-bold text-teal mt-2">
+                ₦{{ car.formatted_price }}
+            </p>
+
+            <div class="flex flex-wrap items-center gap-3 text-sm text-gray-600 mt-3">
+                <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-3z"/></svg>
+                    {{ car.mileage|floatformat:0 }} km
+                </span>
+                <span>•</span>
+                <span>{{ car.get_transmission_display }}</span>
+                {% if car.fuel_type %}
+                    <span>•</span>
+                    <span>{{ car.get_fuel_type_display }}</span>
+                {% endif %}
+            </div>
+        </div>
+    </a>
+</div>

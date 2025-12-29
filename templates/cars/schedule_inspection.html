@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto py-8 px-4">
+    <h1 class="text-3xl font-bold mb-6">Schedule Inspection</h1>
+    
+    <form method="POST" class="space-y-6">
+        {% csrf_token %}
+        
+        <div>
+            <label class="block font-semibold mb-2">Preferred Date</label>
+            <input type="date" name="inspection_date" required
+                   class="w-full px-4 py-3 border rounded-lg">
+        </div>
+        
+        <div>
+            <label class="block font-semibold mb-2">Preferred Time</label>
+            <input type="time" name="inspection_time" required
+                   class="w-full px-4 py-3 border rounded-lg">
+        </div>
+        
+        <div>
+            <label class="block font-semibold mb-2">Location</label>
+            <select name="inspection_location" required
+                    class="w-full px-4 py-3 border rounded-lg">
+                <option value="">Choose location...</option>
+                <option value="Our Showroom - Lagos">Our Showroom - Lagos</option>
+                <option value="Your Location">Your Location (we'll visit)</option>
+            </select>
+        </div>
+        
+        <button type="submit" 
+                class="w-full bg-teal text-white py-4 rounded-lg font-bold">
+            Confirm Inspection
+        </button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,267 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Booking #{{ booking.id }} - {{ car.title }}{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen py-8">
+    <div class="max-w-6xl mx-auto px-4">
+        
+        <!-- Header -->
+        <div class="mb-6">
+            <a href="{{ car.get_absolute_url }}" class="text-teal hover:text-teal-600 flex items-center space-x-2 mb-4">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                </svg>
+                <span>Back to Car Details</span>
+            </a>
+            <h1 class="text-3xl font-bold text-primary">Booking #{{ booking.id }}</h1>
+            <p class="text-gray-600">{{ car.title }}</p>
+        </div>
+        
+        <!-- Free Gift Banner -->
+        {% if show_free_gift_banner %}
+        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl p-6 mb-6 shadow-lg">
+            <div class="flex items-center space-x-4">
+                <div class="text-5xl">🎁</div>
+                <div>
+                    <h3 class="font-bold text-xl mb-1">FREE Gift Included!</h3>
+                    <p class="text-yellow-50">Complete your purchase and receive 5 litres of Premium Engine Oil absolutely FREE!</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- LEFT: Progress & Info -->
+            <div class="lg:col-span-1 space-y-6">
+                
+                <!-- Progress Card -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="font-bold text-lg mb-4">Booking Progress</h3>
+                    
+                    <!-- Progress Bar -->
+                    <div class="mb-6">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="text-sm font-semibold text-gray-700">{{ progress }}% Complete</span>
+                            <span class="text-sm font-bold text-teal">{{ booking.get_status_display }}</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div class="bg-gradient-to-r from-teal to-green-500 h-3 rounded-full transition-all duration-500"
+                                 style="width: {{ progress }}%"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Steps -->
+                    <div class="space-y-3">
+                        {% for step_id, step_label in booking.BOOKING_STATUS_CHOICES %}
+                        <div class="flex items-center space-x-3 {% if booking.status == step_id %}text-teal font-semibold{% else %}text-gray-400{% endif %}">
+                            <div class="w-8 h-8 rounded-full flex items-center justify-center {% if booking.status == step_id %}bg-teal text-white{% else %}bg-gray-200{% endif %}">
+                                {% if step_id|slice:":1" != '❌' and step_id|slice:":1" != '✅' %}
+                                    {{ step_label|slice:":1" }}
+                                {% else %}
+                                    {{ step_label|slice:":2" }}
+                                {% endif %}
+                            </div>
+                            <span class="text-sm">{{ step_label|slice:"2:" }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <!-- Car Info Card -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="font-bold text-lg mb-4">Vehicle Details</h3>
+                    {% if car.main_image %}
+                    <img src="{{ car.main_image.image.url }}" alt="{{ car.title }}"
+                         class="w-full h-40 object-cover rounded-lg mb-4">
+                    {% endif %}
+                    <h4 class="font-semibold text-primary mb-2">{{ car.title }}</h4>
+                    <div class="space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Original Price:</span>
+                            <span class="font-semibold {% if booking.negotiated_price %}line-through text-gray-400{% endif %}">{{ car.formatted_price }}</span>
+                        </div>
+                        {% if booking.negotiated_price %}
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Negotiated Price:</span>
+                            <span class="font-bold text-green-600">{{ booking.formatted_final_price }}</span>
+                        </div>
+                        {% endif %}
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Year:</span>
+                            <span class="font-semibold">{{ car.year }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-600">Condition:</span>
+                            <span class="font-semibold">{{ car.get_condition_display }}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Next Action -->
+                {% if next_action.can_do and next_action.button_url %}
+                <div class="bg-blue-50 border-2 border-blue-500 rounded-xl p-6">
+                    <h3 class="font-bold text-lg text-blue-900 mb-2">{{ next_action.title }}</h3>
+                    <p class="text-blue-800 text-sm mb-4">{{ next_action.description }}</p>
+                    <a href="{{ next_action.button_url }}" 
+                       class="block w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-center transition">
+                        {{ next_action.button_text }}
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- RIGHT: Chat & Timeline -->
+            <div class="lg:col-span-2 space-y-6">
+                
+                <!-- Chat Box -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
+                    <div class="bg-gradient-to-r from-primary to-teal text-white p-4">
+                        <h3 class="font-bold text-lg flex items-center">
+                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.4-4 8-9 8a10 10 0 01-4.3-.9L3 20l1.4-3.7A9 9 0 013 12c0-4.4 4-8 9-8s9 3.6 9 8z"></path>
+                            </svg>
+                            Chat with Us
+                        </h3>
+                        <p class="text-sm text-white/80">Negotiate price, ask questions, get updates</p>
+                    </div>
+                    
+                    <!-- Messages -->
+                    <div id="chatMessages" class="p-4 space-y-4 max-h-96 overflow-y-auto bg-gray-50">
+                        {% for message in messages %}
+                        <div class="flex {% if message.is_from_admin %}justify-start{% else %}justify-end{% endif %}">
+                            <div class="max-w-xs lg:max-w-md">
+                                <!-- Sender Label -->
+                                <div class="text-xs text-gray-500 mb-1 {% if message.is_from_admin %}text-left{% else %}text-right{% endif %}">
+                                    {% if message.is_from_admin %}👨‍💼 Enoriel Team{% else %}You{% endif %}
+                                </div>
+                                
+                                <!-- Message Bubble -->
+                                <div class="{% if message.is_from_admin %}bg-white border border-gray-200{% else %}bg-teal text-white{% endif %} rounded-2xl p-4 shadow-sm">
+                                    {% if message.price_offer %}
+                                    <div class="bg-green-100 border-l-4 border-green-500 p-2 rounded mb-2">
+                                        <span class="text-xs font-semibold text-green-800">Price Offer:</span>
+                                        <span class="font-bold text-green-900 ml-2">₦{{ message.price_offer|floatformat:0|intcomma }}</span>
+                                    </div>
+                                    {% endif %}
+                                    
+                                    <p class="text-sm whitespace-pre-wrap">{{ message.message }}</p>
+                                    
+                                    {% if message.attachment %}
+                                    <a href="{{ message.attachment.url }}" target="_blank" 
+                                       class="inline-flex items-center space-x-2 mt-2 text-xs text-blue-600 hover:text-blue-800">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
+                                        </svg>
+                                        <span>View Attachment</span>
+                                    </a>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Timestamp -->
+                                <div class="text-xs text-gray-400 mt-1 {% if message.is_from_admin %}text-left{% else %}text-right{% endif %}">
+                                    {{ message.created_at|date:"M d, g:i A" }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    
+                    <!-- Message Input -->
+                    <form method="POST" class="border-t border-gray-200 p-4 bg-white">
+                        {% csrf_token %}
+                        
+                        <!-- Optional: Price Offer -->
+                        <div class="mb-3">
+                            <label class="text-xs font-semibold text-gray-700 mb-1 block">💰 Include Price Offer (Optional)</label>
+                            <input type="number" name="price_offer" 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent text-sm"
+                                   placeholder="e.g., 5000000" step="1000">
+                        </div>
+                        
+                        <!-- Message -->
+                        <div class="flex space-x-2">
+                            <textarea name="message" rows="2" required
+                                      class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent resize-none"
+                                      placeholder="Type your message..."></textarea>
+                            <button type="submit" 
+                                    class="bg-teal hover:bg-teal-600 text-white px-6 rounded-lg font-semibold transition">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                                </svg>
+                            </button>
+                        </div>
+                        
+                        <p class="text-xs text-gray-500 mt-2">
+                            💡 Tip: Include a price offer to start negotiating!
+                        </p>
+                    </form>
+                </div>
+                
+                <!-- Timeline -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="font-bold text-xl mb-6 flex items-center">
+                        <svg class="w-6 h-6 text-teal mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Activity Timeline
+                    </h3>
+                    
+                    <div class="space-y-4">
+                        {% for activity in activities %}
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0">
+                                <div class="w-10 h-10 bg-teal text-white rounded-full flex items-center justify-center font-bold">
+                                    ✓
+                                </div>
+                            </div>
+                            
+                            <div class="flex-1 {% if not forloop.last %}pb-6 border-l-2 border-gray-200 pl-6 ml-5{% endif %}">
+                                <div class="bg-gray-50 rounded-lg p-4">
+                                    <h4 class="font-semibold text-primary mb-1">{{ activity.title }}</h4>
+                                    {% if activity.description %}
+                                    <p class="text-gray-600 text-sm mb-2">{{ activity.description }}</p>
+                                    {% endif %}
+                                    <div class="flex items-center space-x-4 text-xs text-gray-500">
+                                        <span>{{ activity.created_at|date:"M d, Y • g:i A" }}</span>
+                                        <span>•</span>
+                                        <span>By {{ activity.performed_by }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Auto-scroll chat to bottom -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const chatDiv = document.getElementById('chatMessages');
+    if (chatDiv) {
+        chatDiv.scrollTop = chatDiv.scrollHeight;
+    }
+    
+    // Poll for new messages every 10 seconds
+    setInterval(async function() {
+        try {
+            const response = await fetch('/api/booking/{{ booking.id }}/updates/?last_check={{ booking.updated_at|date:"c" }}');
+            const data = await response.json();
+            
+            if (data.success && data.new_messages > 0) {
+                window.location.reload();
+            }
+        } catch (error) {
+            console.log('Update check failed:', error);
+        }
+    }, 10000);
+});
+</script>
+{% endblock %}

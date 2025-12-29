@@ -1,0 +1,42 @@
+{% load car_tags %}
+
+{# sections is expected to be a list of dicts: {slug, title, cars, view_all (optional)} #}
+
+{% for section in sections %}
+<section class="py-10 {% cycle 'bg-white' 'bg-gray-50' %}">
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-xl md:text-2xl font-bold text-gray-900">{{ section.title }}</h3>
+        {% if section.subtitle %}<p class="text-sm text-gray-600 mt-1">{{ section.subtitle }}</p>{% endif %}
+      </div>
+      <div>
+        {% if section.view_all %}
+          <a href="{% url 'car_list' %}{{ section.view_all }}" class="text-sm text-cyan font-semibold hover:underline">View All</a>
+        {% else %}
+          <a href="{% url 'car_list' %}?section={{ section.slug }}" class="text-sm text-cyan font-semibold hover:underline">View All</a>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Horizontal scroll row -->
+    <div class="-mx-4 overflow-x-auto py-2 scrollbar-hide">
+      <div class="flex space-x-4 px-4">
+        {% for car in section.cars|slice:":10" %}
+          <div class="shrink-0 w-1/2 sm:w-1/3 md:w-64">
+            {% include 'cars/partials/car_card.html' with car=car %}
+          </div>
+        {% empty %}
+          <div class="text-gray-500 p-4">No cars available</div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endfor %}
+
+<style>
+/* hide native scrollbar for modern browsers (production consider vendor prefixes carefully) */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+</style>

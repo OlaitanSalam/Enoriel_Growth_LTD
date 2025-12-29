@@ -1,0 +1,909 @@
+{% extends 'base.html' %}
+{% load car_tags %}
+
+{% block title %}Browse Cars - {{ total_count }} Cars for Sale in Nigeria | Enoriel Cars{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Double Thumb Range Slider - Single Line */
+    .range-slider {
+        position: relative;
+        height: 4px;
+        background: #e2e8f0;
+        border-radius: 2px;
+        margin: 20px 0;
+    }
+
+    .range-slider .track {
+        position: absolute;
+        height: 100%;
+        background: #009CA6;
+        border-radius: 2px;
+    }
+
+    .range-slider input[type="range"] {
+        position: absolute;
+        width: 100%;
+        height: 4px;
+        background: transparent;
+        pointer-events: none;
+        -webkit-appearance: none;
+        appearance: none;
+        top: 0;
+    }
+
+    .range-slider input[type="range"]::-webkit-slider-thumb {
+        pointer-events: all;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #009CA6;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        cursor: pointer;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+
+    .range-slider input[type="range"]::-moz-range-thumb {
+        pointer-events: all;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background: #009CA6;
+        border: 2px solid #fff;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        cursor: pointer;
+    }
+
+    .range-values {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 10px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #001F3F;
+    }
+
+    /* Filter Modal */
+    .filter-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        backdrop-filter: blur(4px);
+    }
+
+    .filter-modal.active {
+        display: block;
+    }
+
+    .filter-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 20px 20px 0 0;
+        max-height: 85vh;
+        overflow-y: auto;
+        transform: translateY(100%);
+        transition: transform 0.3s ease;
+    }
+
+    .filter-modal.active .filter-content {
+        transform: translateY(0);
+    }
+
+    .filter-header {
+        padding: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+        border-radius: 20px 20px 0 0;
+    }
+
+    .filter-body {
+        padding: 20px;
+        padding-bottom: 80px;
+    }
+
+    .filter-apply {
+        position: sticky;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 20px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+    }
+
+    /* Responsive Grid - Updated to 4 columns on desktop */
+    .cars-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.5rem;
+    }
+
+    @media (min-width: 768px) {
+        .cars-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+    }
+
+    @media (min-width: 1024px) {
+        .cars-grid {
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+    }
+
+    /* Filter Sidebar - Desktop - Updated for single card with scroll */
+    @media (min-width: 1024px) {
+        .filter-sidebar {
+            display: block !important;
+            height: calc(100vh - 200px);
+            overflow-y: auto;
+            position: sticky;
+            top: 100px;
+        }
+        
+        .filter-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .filter-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .filter-section:last-child {
+            margin-bottom: 0;
+        }
+        
+        .filter-section h3 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #001F3F;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        /* Button grid for apply/reset */
+        .filter-buttons {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+        }
+    }
+
+    /* Form Styles */
+    .filter-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        transition: all 0.2s ease;
+    }
+
+    .filter-input:focus {
+        outline: none;
+        border-color: #009CA6;
+        box-shadow: 0 0 0 3px rgba(0, 156, 166, 0.1);
+    }
+
+    .filter-select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        cursor: pointer;
+    }
+
+    .filter-select:focus {
+        outline: none;
+        border-color: #009CA6;
+        box-shadow: 0 0 0 3px rgba(0, 156, 166, 0.1);
+    }
+
+    /* Filter Badge */
+    .filter-badge {
+        background: #009CA6;
+        color: white;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 12px;
+        margin-left: 8px;
+    }
+
+    /* Updated Filter Bar for better mobile layout */
+    .filter-bar {
+        display: flex;
+        gap: 0.75rem;
+        align-items: center;
+    }
+
+    .filter-toggle {
+        background: #009CA6;
+        color: white;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: none;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    .sort-button {
+        background: white;
+        color: #374151;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 0.875rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        border: 1px solid #d1d5db;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+
+    @media (max-width: 640px) {
+        .filter-toggle,
+        .sort-button {
+            padding: 0.6rem 0.8rem;
+            font-size: 0.8rem;
+        }
+        
+        .filter-toggle svg,
+        .sort-button svg {
+            width: 16px;
+            height: 16px;
+        }
+    }
+
+    /* Slider icon style */
+    .sliders-icon {
+        width: 16px;
+        height: 16px;
+    }
+
+    /* Fix for text breaking in car cards - no truncation */
+@media (max-width: 640px) {
+    .car-card-modern .grid {
+         gap: 0.375rem 0.75rem !important;
+    }
+    
+    /* Prevent text from breaking */
+    .car-card-modern .flex.items-center > span:not(:first-child) {
+        white-space: nowrap;
+        flex-shrink: 1;
+        min-width: 0;
+    }
+    
+    /* Reduce spacing for small screens */
+    .car-card-modern .space-x-1\.5 {
+        gap: 0.25rem;
+    }
+}
+
+/* For very narrow devices */
+@media (max-width: 375px) {
+    .car-card-modern .text-\[11px\] {
+        font-size: 10px;
+    }
+    
+    .car-card-modern .grid {
+        gap: 0.375rem 0.5rem !important;
+    }
+    
+    .car-card-modern .w-4 {
+        width: 12px;
+        height: 12px;
+    }
+}
+
+@media (max-width: 320px) {
+    .car-card-modern .text-\[11px\] {
+        font-size: 9px;
+    }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-6">
+        <!-- Breadcrumb -->
+        <nav class="text-sm mb-6">
+            <ol class="flex items-center space-x-2 text-gray-600">
+                <li><a href="{% url 'home' %}" class="hover:text-teal transition-colors">Home</a></li>
+                <li>/</li>
+                <li class="text-gray-900 font-medium"><a href="{% url 'car_list' %}" class="hover:text-teal transition-colors">Browse Cars</a></li>
+            </ol>
+        </nav>
+
+        <!-- Header -->
+        <div class="mb-6">
+            <h1 class="text-3xl font-bold text-primary mb-2">Find Your Perfect Car</h1>
+       <!--     <p class="text-gray-600">{{ total_count }} cars available{% if search_query %} matching "{{ search_query }}"{% endif %}</p>-->
+        </div>
+
+        <!-- Filter Bar - Updated layout -->
+        <div class="bg-white rounded-xl shadow-sm p-4 mb-6">
+            <div class="filter-bar">
+                <button id="mobile-filter-toggle" class="filter-toggle lg:hidden">
+                    <svg class="sliders-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.414A1 1 0 013 6.707V4z"></path>
+                    </svg>
+                    Filters
+                    {% if applied_filters_count > 0 %}
+                    <span class="filter-badge">{{ applied_filters_count }}</span>
+                    {% endif %}
+                </button>
+
+                <!-- Sort Button - Updated to button with label -->
+                <button id="sort-toggle" class="sort-button lg:hidden">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h9m5-4v12m0 0l-4-4m4 4l4-4"></path>
+                    </svg>
+                    Sort By
+                </button>
+
+                <!-- Desktop Sort Options -->
+                <form method="get" class="hidden lg:flex items-center space-x-4 ml-auto">
+                    {% for key, value in request.GET.items %}
+                        {% if key != 'ordering' %}
+                            <input type="hidden" name="{{ key }}" value="{{ value }}">
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <label class="text-sm font-medium text-gray-700 whitespace-nowrap">Sort by:</label>
+                    <select name="ordering" onchange="this.form.submit()" class="filter-select w-auto">
+                        <option value="-created_at" {% if request.GET.ordering == '-created_at' or not request.GET.ordering %}selected{% endif %}>Newest First</option>
+                        <option value="price" {% if request.GET.ordering == 'price' %}selected{% endif %}>Price: Low to High</option>
+                        <option value="-price" {% if request.GET.ordering == '-price' %}selected{% endif %}>Price: High to Low</option>
+                        <option value="-year" {% if request.GET.ordering == '-year' %}selected{% endif %}>Year: Newest</option>
+                        <option value="year" {% if request.GET.ordering == 'year' %}selected{% endif %}>Year: Oldest</option>
+                        <option value="mileage" {% if request.GET.ordering == 'mileage' %}selected{% endif %}>Mileage: Low to High</option>
+                        <option value="-views" {% if request.GET.ordering == '-views' %}selected{% endif %}>Most Popular</option>
+                    </select>
+                </form>
+            </div>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Desktop Filter Sidebar - Updated to single card with scroll -->
+            <aside class="hidden lg:block lg:w-80 flex-shrink-0 filter-sidebar">
+                <div class="filter-card">
+                    <form method="get" id="desktop-filter-form">
+                        <!-- Search -->
+                        <div class="filter-section">
+                            <h3>Search</h3>
+                            <input type="text" name="search" value="{{ request.GET.search }}" 
+                                   placeholder="Make, model, keyword..." class="filter-input">
+                        </div>
+
+                        <!-- Price Range -->
+                        <div class="filter-section">
+                            <h3>Price Range (₦)</h3>
+                            <div class="range-slider" id="priceSlider">
+                                <div class="track" id="priceTrack"></div>
+                                <input type="range" min="0" max="100000000" value="{{ request.GET.min_price|default:'0' }}" step="100000" id="minPrice">
+                                <input type="range" min="0" max="100000000" value="{{ request.GET.max_price|default:'100000000' }}" step="100000" id="maxPrice">
+                            </div>
+                            <div class="range-values">
+                                <span id="minPriceLabel">₦0</span>
+                                <span id="maxPriceLabel">₦100M+</span>
+                            </div>
+                            <input type="hidden" name="min_price" id="minPriceHidden" value="{{ request.GET.min_price|default:'0' }}">
+                            <input type="hidden" name="max_price" id="maxPriceHidden" value="{{ request.GET.max_price|default:'100000000' }}">
+                        </div>
+
+                        <!-- Make & Model -->
+                        <div class="filter-section">
+                            <h3>Vehicle</h3>
+                            <div class="space-y-4">
+                                {{ filter.form.make }}
+                                <input type="text" name="model" value="{{ request.GET.model }}" placeholder="Model" class="filter-input">
+                            </div>
+                        </div>
+
+                        <!-- Year Range -->
+                        <div class="filter-section">
+                            <h3>Year</h3>
+                            <div class="grid grid-cols-2 gap-3">
+                                <input type="number" name="min_year" value="{{ request.GET.min_year }}" placeholder="Min" min="1990" max="2024" class="filter-input">
+                                <input type="number" name="max_year" value="{{ request.GET.max_year }}" placeholder="Max" min="1990" max="2024" class="filter-input">
+                            </div>
+                        </div>
+
+                        <!-- Mileage -->
+                        <!-- Mileage -->
+                        <div class="filter-section">
+                            <h3>Mileage (km)</h3>
+                            <div class="range-slider" id="mileageSlider">
+                                <div class="track" id="mileageTrack"></div>
+                                <input type="range" min="0" max="100000" value="{{ request.GET.min_mileage|default:'0' }}" step="1000" id="minMileage">
+                                <input type="range" min="0" max="100000" value="{{ request.GET.max_mileage|default:'100000' }}" step="1000" id="maxMileage">
+                            </div>
+                            <div class="range-values">
+                                <span id="minMileageLabel">0 km</span>
+                                <span id="maxMileageLabel">100k+ km</span>
+                            </div>
+                            <input type="hidden" name="min_mileage" id="minMileageHidden" value="{{ request.GET.min_mileage|default:'0' }}">
+                            <input type="hidden" name="max_mileage" id="maxMileageHidden" value="{{ request.GET.max_mileage|default:'100000' }}">
+                        </div>
+
+                        <!-- Other Filters -->
+                        <div class="filter-section">
+                            <h3>Specifications</h3>
+                            <div class="space-y-4">
+                                {{ filter.form.transmission }}
+                                {{ filter.form.fuel_type }}
+                                {{ filter.form.condition }}
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons - Updated to side by side -->
+                        <div class="filter-buttons">
+                            <button type="submit" class="bg-teal hover:bg-teal-600 text-white py-3 rounded-lg font-semibold transition">
+                                Apply Filters
+                            </button>
+                            <a href="{% url 'car_list' %}" class="bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-lg font-semibold transition text-center">
+                                Reset
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="flex-1">
+                <!-- Car Grid -->
+                {% if cars %}
+                    <div class="cars-grid">
+                        {% for car in cars %}
+                            {% include 'cars/partials/car_card.html' with car=car %}
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if page_obj.has_other_pages %}
+                    <div class="flex justify-center mt-8">
+                        <nav class="flex items-center space-x-2">
+                            {% if page_obj.has_previous %}
+                                <a href="?{% get_filter_query_string request page=page_obj.previous_page_number %}" 
+                                   class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                    Previous
+                                </a>
+                            {% endif %}
+                            
+                            {% for num in page_obj.paginator.page_range %}
+                                {% if page_obj.number == num %}
+                                    <span class="px-4 py-2 bg-teal text-white rounded-lg font-semibold">
+                                        {{ num }}
+                                    </span>
+                                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                    <a href="?{% get_filter_query_string request page=num %}" 
+                                       class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                        {{ num }}
+                                    </a>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if page_obj.has_next %}
+                                <a href="?{% get_filter_query_string request page=page_obj.next_page_number %}" 
+                                   class="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">
+                                    Next
+                                </a>
+                            {% endif %}
+                        </nav>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-12">
+                        <svg class="w-24 h-24 text-gray-400 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <h3 class="text-2xl font-bold text-gray-900 mb-2">No cars found</h3>
+                        <p class="text-gray-600 mb-6">Try adjusting your filters or search terms</p>
+                        <a href="{% url 'car_list' %}" class="inline-block bg-teal hover:bg-teal-600 text-white px-6 py-3 rounded-lg font-semibold transition">
+                            View All Cars
+                        </a>
+                    </div>
+                {% endif %}
+            </main>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Filter Modal -->
+<div id="filterModal" class="filter-modal">
+    <div class="filter-content">
+        <div class="filter-header">
+            <h2 class="text-lg font-semibold">Filters</h2>
+            <button id="closeFilterModal" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <form method="get" id="mobile-filter-form" class="filter-body">
+            <div class="space-y-6">
+                <!-- Search -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+                    <input type="text" name="search" value="{{ request.GET.search }}" 
+                           placeholder="Make, model, keyword..." class="filter-input">
+                </div>
+
+                <!-- Price Range -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Price Range (₦)</label>
+                    <div class="range-slider" id="mobilePriceSlider">
+                        <div class="track" id="mobilePriceTrack"></div>
+                        <input type="range" min="0" max="100000000" value="{{ request.GET.min_price|default:'0' }}" step="100000" id="mobileMinPrice">
+                        <input type="range" min="0" max="100000000" value="{{ request.GET.max_price|default:'100000000' }}" step="100000" id="mobileMaxPrice">
+                    </div>
+                    <div class="range-values">
+                        <span id="mobileMinPriceLabel">₦0</span>
+                        <span id="mobileMaxPriceLabel">₦100M+</span>
+                    </div>
+                    <input type="hidden" name="min_price" id="mobileMinPriceHidden" value="{{ request.GET.min_price|default:'0' }}">
+                    <input type="hidden" name="max_price" id="mobileMaxPriceHidden" value="{{ request.GET.max_price|default:'100000000' }}">
+                </div>
+
+                <!-- Make & Model -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Vehicle</label>
+                    <div class="space-y-3">
+                        {{ filter.form.make }}
+                        <input type="text" name="model" value="{{ request.GET.model }}" placeholder="Model" class="filter-input">
+                    </div>
+                </div>
+
+                <!-- Year Range -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Year</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <input type="number" name="min_year" value="{{ request.GET.min_year }}" placeholder="Min" min="1990" max="2024" class="filter-input">
+                        <input type="number" name="max_year" value="{{ request.GET.max_year }}" placeholder="Max" min="1990" max="2024" class="filter-input">
+                    </div>
+                </div>
+
+                <!-- Mileage Range -->
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Mileage (km)</label>
+                    <div class="range-slider" id="mobileMileageSlider">
+                        <div class="track" id="mobileMileageTrack"></div>
+                        <input type="range" min="0" max="100000" value="{{ request.GET.min_mileage|default:'0' }}" step="1000" id="mobileMinMileage">
+                        <input type="range" min="0" max="100000" value="{{ request.GET.max_mileage|default:'100000' }}" step="1000" id="mobileMaxMileage">
+                    </div>
+                    <div class="range-values">
+                        <span id="mobileMinMileageLabel">0 km</span>
+                        <span id="mobileMaxMileageLabel">100k+ km</span>
+                    </div>
+                    <input type="hidden" name="min_mileage" id="mobileMinMileageHidden" value="{{ request.GET.min_mileage|default:'0' }}">
+                    <input type="hidden" name="max_mileage" id="mobileMaxMileageHidden" value="{{ request.GET.max_mileage|default:'100000' }}">
+                </div>
+
+                <!-- Other Filters -->
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Transmission</label>
+                        {{ filter.form.transmission }}
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Fuel Type</label>
+                        {{ filter.form.fuel_type }}
+                    </div>
+                </div>
+            </div>
+        </form>
+
+        <div class="filter-apply">
+            <button type="button" id="applyMobileFilters" class="w-full bg-teal hover:bg-teal-600 text-white py-4 rounded-lg font-semibold transition">
+                Apply Filters
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Mobile Sort Modal -->
+<div id="sortModal" class="filter-modal">
+    <div class="filter-content">
+        <div class="filter-header">
+            <h2 class="text-lg font-semibold">Sort By</h2>
+            <button id="closeSortModal" class="text-gray-500 hover:text-gray-700">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        
+        <div class="filter-body">
+            <form method="get" id="mobile-sort-form" class="space-y-3">
+                {% for key, value in request.GET.items %}
+                    {% if key != 'ordering' %}
+                        <input type="hidden" name="{{ key }}" value="{{ value }}">
+                    {% endif %}
+                {% endfor %}
+                
+                {% for value, label in sort_options %}
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer">
+                    <input type="radio" name="ordering" value="{{ value }}" 
+                           {% if request.GET.ordering == value or not request.GET.ordering and value == '-created_at' %}checked{% endif %}
+                           class="text-teal focus:ring-teal">
+                    <span class="flex-1">{{ label }}</span>
+                </label>
+                {% endfor %}
+            </form>
+        </div>
+
+        <div class="filter-apply">
+            <button type="button" id="applyMobileSort" class="w-full bg-teal hover:bg-teal-600 text-white py-4 rounded-lg font-semibold transition">
+                Apply Sort
+            </button>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Mobile Filter Modal
+    const mobileFilterToggle = document.getElementById('mobile-filter-toggle');
+    const filterModal = document.getElementById('filterModal');
+    const closeFilterModal = document.getElementById('closeFilterModal');
+    const applyMobileFilters = document.getElementById('applyMobileFilters');
+
+    // Mobile Sort Modal
+    const sortToggle = document.getElementById('sort-toggle');
+    const sortModal = document.getElementById('sortModal');
+    const closeSortModal = document.getElementById('closeSortModal');
+    const applyMobileSort = document.getElementById('applyMobileSort');
+
+    if (mobileFilterToggle) {
+        mobileFilterToggle.addEventListener('click', () => {
+            filterModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    if (closeFilterModal) {
+        closeFilterModal.addEventListener('click', () => {
+            filterModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    }
+
+    if (applyMobileFilters) {
+        applyMobileFilters.addEventListener('click', () => {
+            document.getElementById('mobile-filter-form').submit();
+        });
+    }
+
+    if (sortToggle) {
+        sortToggle.addEventListener('click', () => {
+            sortModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+    }
+
+    if (closeSortModal) {
+        closeSortModal.addEventListener('click', () => {
+            sortModal.classList.remove('active');
+            document.body.style.overflow = 'auto';
+        });
+    }
+
+    if (applyMobileSort) {
+        applyMobileSort.addEventListener('click', () => {
+            document.getElementById('mobile-sort-form').submit();
+        });
+    }
+
+    // Close modals when clicking outside
+    [filterModal, sortModal].forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+                document.body.style.overflow = 'auto';
+            }
+        });
+    });
+
+    // Double Thumb Range Slider Functionality
+    function initializeRangeSlider(minSlider, maxSlider, track, minLabel, maxLabel, minHidden, maxHidden, formatFn, isUnlimited = false) {
+        function updateSlider() {
+            const minVal = parseInt(minSlider.value);
+            let maxVal = parseInt(maxSlider.value);
+            
+            // For unlimited sliders (price and mileage), when max is at maximum, set a special value to indicate "and above"
+            if (isUnlimited && maxVal === parseInt(maxSlider.max)) {
+                maxVal = 'above'; // Special value to indicate no upper limit
+            }
+            
+            if (minVal > maxVal && maxVal !== 'above') {
+                const temp = minVal;
+                minSlider.value = maxVal;
+                maxSlider.value = temp;
+                maxVal = parseInt(maxSlider.value);
+            }
+            
+            const minPercent = (minVal / parseInt(minSlider.max)) * 100;
+            const maxPercent = (maxVal === 'above' ? 100 : (maxVal / parseInt(maxSlider.max)) * 100);
+            
+            track.style.left = minPercent + '%';
+            track.style.right = (100 - maxPercent) + '%';
+            
+            minLabel.textContent = formatFn(minVal);
+            
+            // Set the appropriate "+" label based on the slider type
+            if (maxVal === 'above') {
+                if (minSlider.id.includes('Price')) {
+                    maxLabel.textContent = '₦100M+';
+                } else if (minSlider.id.includes('Mileage')) {
+                    maxLabel.textContent = '100k+ km';
+                }
+            } else {
+                maxLabel.textContent = formatFn(maxVal);
+            }
+            
+            minHidden.value = minVal;
+            // For unlimited sliders, when max is "above", we don't set max value so it includes all above min
+            maxHidden.value = maxVal === 'above' ? '' : maxVal;
+        }
+        
+        minSlider.addEventListener('input', updateSlider);
+        maxSlider.addEventListener('input', updateSlider);
+        updateSlider();
+    }
+
+    // Price formatter
+    function formatPrice(value) {
+        if (value >= 100000000) {
+            return '₦100M+';
+        } else if (value >= 1000000) {
+            return '₦' + (value / 1000000).toFixed(1) + 'M';
+        } else if (value >= 1000) {
+            return '₦' + (value / 1000).toFixed(0) + 'K';
+        }
+        return '₦' + value;
+    }
+
+    // Mileage formatter
+    function formatMileage(value) {
+        if (value >= 100000) {
+            return '100k+ km';
+        } else if (value >= 1000) {
+            return (value / 1000).toFixed(0) + 'k km';
+        }
+        return value + ' km';
+    }
+
+    // Initialize sliders when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Desktop sliders
+        if (document.getElementById('minPrice')) {
+            initializeRangeSlider(
+                document.getElementById('minPrice'),
+                document.getElementById('maxPrice'),
+                document.getElementById('priceTrack'),
+                document.getElementById('minPriceLabel'),
+                document.getElementById('maxPriceLabel'),
+                document.getElementById('minPriceHidden'),
+                document.getElementById('maxPriceHidden'),
+                formatPrice,
+                true // This is an unlimited slider
+            );
+        }
+
+        if (document.getElementById('minMileage')) {
+            initializeRangeSlider(
+                document.getElementById('minMileage'),
+                document.getElementById('maxMileage'),
+                document.getElementById('mileageTrack'),
+                document.getElementById('minMileageLabel'),
+                document.getElementById('maxMileageLabel'),
+                document.getElementById('minMileageHidden'),
+                document.getElementById('maxMileageHidden'),
+                formatMileage,
+                true // This is an unlimited slider
+            );
+        }
+
+        // Mobile sliders
+        if (document.getElementById('mobileMinPrice')) {
+            initializeRangeSlider(
+                document.getElementById('mobileMinPrice'),
+                document.getElementById('mobileMaxPrice'),
+                document.getElementById('mobilePriceTrack'),
+                document.getElementById('mobileMinPriceLabel'),
+                document.getElementById('mobileMaxPriceLabel'),
+                document.getElementById('mobileMinPriceHidden'),
+                document.getElementById('mobileMaxPriceHidden'),
+                formatPrice,
+                true // This is an unlimited slider
+            );
+        }
+
+        // Mobile mileage slider (if exists in mobile modal)
+        if (document.getElementById('mobileMinMileage')) {
+            initializeRangeSlider(
+                document.getElementById('mobileMinMileage'),
+                document.getElementById('mobileMaxMileage'),
+                document.getElementById('mobileMileageTrack'),
+                document.getElementById('mobileMinMileageLabel'),
+                document.getElementById('mobileMaxMileageLabel'),
+                document.getElementById('mobileMinMileageHidden'),
+                document.getElementById('mobileMaxMileageHidden'),
+                formatMileage,
+                true // This is an unlimited slider
+            );
+        }
+
+        // Update filter badge count
+        function updateFilterBadge() {
+            const form = document.getElementById('desktop-filter-form');
+            const inputs = form.querySelectorAll('input, select');
+            let count = 0;
+            
+            inputs.forEach(input => {
+                if ((input.type === 'text' && input.value) ||
+                    (input.type === 'number' && input.value) ||
+                    (input.type === 'select-one' && input.value && input.value !== '') ||
+                    (input.type === 'hidden' && input.name.includes('min_') && input.value !== input.defaultValue) ||
+                    (input.type === 'hidden' && input.name.includes('max_') && input.value !== input.defaultValue && input.value !== '')) {
+                    count++;
+                }
+            });
+            
+            let badge = document.querySelector('.filter-badge');
+            if (count > 0) {
+                if (!badge) {
+                    badge = document.createElement('span');
+                    badge.className = 'filter-badge';
+                    mobileFilterToggle.appendChild(badge);
+                }
+                badge.textContent = count;
+            } else if (badge) {
+                badge.remove();
+            }
+        }
+
+        // Update badge when form changes
+        document.getElementById('desktop-filter-form').addEventListener('change', updateFilterBadge);
+        document.getElementById('desktop-filter-form').addEventListener('input', updateFilterBadge);
+        updateFilterBadge();
+    });
+</script>
+{% endblock %}

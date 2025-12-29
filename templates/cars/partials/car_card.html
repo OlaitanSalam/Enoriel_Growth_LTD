@@ -1,0 +1,120 @@
+{% load car_tags %}
+
+<div class="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-200 car-card-modern group {% if car.is_sold %}relative{% endif %}"
+     {% if car.is_sold %}style="pointer-events: none;"{% endif %}>
+
+    <!-- Sold Badge - Top Right (always visible) -->
+    {% if car.is_sold %}
+        <div class="absolute top-2 right-2 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold uppercase shadow-lg z-10">
+            SOLD
+        </div>
+    {% endif %}
+
+    <!-- Blurred Content for Sold Cars -->
+    {% if car.is_sold %}
+        <div class="filter blur-sm">
+    {% endif %}
+
+    <a href="{% if car.is_sold %}#{% else %}{% url 'car_detail' car.slug %}{% endif %}" class="block h-full">
+
+        <!-- Image -->
+        <div class="relative h-44 overflow-hidden bg-gray-100 rounded-t-xl">
+            {% if car.prefetched_image %}
+                <img src="{{ car.prefetched_image.image.url }}" 
+                     alt="{{ car.prefetched_image.alt_text|default:car.title }}"
+                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+            {% elif car.main_image %}
+                <img src="{{ car.main_image.image.url }}" 
+                     alt="{{ car.main_image.alt_text|default:car.title }}"
+                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+            {% else %}
+                <div class="w-full h-full flex items-center justify-center bg-gray-200">
+                    <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                    </svg>
+                </div>
+            {% endif %}
+
+            {% if car.featured and not car.is_sold %}
+                <div class="absolute top-2 left-2 bg-gradient-to-r from-secondary to-orange-500 text-white px-3 py-1 rounded-full text-xs font-semibold shadow-md">
+                    🔥 Sweet Deal
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Content -->
+        <div class="p-4">
+
+            <!-- Price -->
+            <div class="mb-1">
+                <div class="text-xl font-extrabold text-teal tracking-tight">
+                    {{ car.price|format_naira }}
+                </div>
+            </div>
+
+            <!-- Title -->
+            <h3 class="text-[15px] font-semibold text-gray-900 mb-2 line-clamp-2 transition-colors h-10">
+                {{ car.title }}
+            </h3>
+
+            <!-- Specs -->
+            <div class="grid grid-cols-2 gap-y-1.5 gap-x-2 text-[11px] text-gray-700 mb-3">
+
+                <!-- Year -->
+                <div class="flex items-center space-x-1.5">
+                    <svg class="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2"viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M8 7V3m8 4V3M4 11h16M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+
+                    <span>{{ car.year }}</span>
+                </div>
+
+                <!-- Transmission -->
+                <div class="flex items-center space-x-1.5">
+                   <svg class="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2"viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M10 6h4l1 3 3 1v4l-3 1-1 3h-4l-1-3-3-1V10l3-1 1-3z" />
+                    </svg>
+
+                    <span>{{ car.get_transmission_display }}</span>
+                </div>
+
+                <!-- Fuel -->
+                <div class="flex items-center space-x-1.5">
+                    <svg class="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2"viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M6 3h7v18H6a2 2 0 01-2-2V5a2 2 0 012-2zm13 5h-3v6a3 3 0 006 0V9l-2-2z" />
+                    </svg>
+
+                    <span>{{ car.get_fuel_type_display }}</span>
+                </div>
+
+                <!-- Mileage -->
+                <div class="flex items-center space-x-1.5">
+                    <svg class="w-4 h-4 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2"viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                            d="M12 3a9 9 0 100 18 9 9 0 000-18zm0 9l4-2" />
+                    </svg>
+
+                    <span>{% if car.mileage %}{{ car.mileage|format_mileage }}{% else %}N/A{% endif %}</span>
+                </div>
+            </div>
+
+            <!-- Location -->
+            {% if car.location %}
+            <div class="flex items-center text-[11px] text-gray-500 border-t border-gray-100 pt-2">
+                <svg class="w-4 h-4 mr-1 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M10 2a6 6 0 00-6 6c0 4.418 6 10 6 10s6-5.582 6-10a6 6 0 00-6-6zm0 8a2 2 0 110-4 2 2 0 010 4z"/>
+                </svg>
+                <span class="truncate">{{ car.location }}</span>
+            </div>
+            {% endif %}
+
+        </div>
+    </a>
+
+    {% if car.is_sold %}
+        </div> <!-- End of blurred content -->
+    {% endif %}
+</div>
