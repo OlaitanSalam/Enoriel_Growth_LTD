@@ -317,13 +317,31 @@
         </div>
     </div>
     
-    <button onclick="showBookingForm()" 
-            class="w-full bg-white text-teal py-4 rounded-xl font-bold hover:bg-gray-50 transition shadow-lg flex items-center justify-center space-x-2">
+   <!-- CTA BUTTONS -->
+<div class="mt-6 space-y-4">
+
+    <!-- PRIMARY CTA -->
+    <button onclick="showBookingForm()"
+        class="w-full bg-teal-600 hover:bg-teal-700 text-white py-4 rounded-xl
+               font-semibold transition shadow-lg flex items-center justify-center gap-3">
+        <!-- Booking / calendar icon -->
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
         </svg>
-        <span>Start Booking Now</span>
+        <span>Start Booking</span>
     </button>
+
+    <!-- SECONDARY CTA (VISIBLE ON WHITE BG) -->
+    <a href="{% url 'my_bookings' %}"
+       class="w-full flex items-center justify-center py-3.5 rounded-xl font-semibold
+              border-2 border-teal-600 text-teal-700 hover:bg-teal-50
+              transition gap-2">
+        <i class="fas fa-list-check text-base"></i>
+        My Bookings
+    </a>
+
+</div>
     
     <p class="text-center text-xs text-white/80 mt-3">
         ✓ No payment needed now • Track everything in-app • Negotiate price online

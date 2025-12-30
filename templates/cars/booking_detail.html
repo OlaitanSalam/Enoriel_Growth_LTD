@@ -4,154 +4,187 @@
 {% block title %}Booking #{{ booking.id }} - {{ car.title }}{% endblock %}
 
 {% block content %}
-<div class="bg-gray-50 min-h-screen py-8">
-    <div class="max-w-6xl mx-auto px-4">
+<div class="bg-gray-50 min-h-screen py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Header -->
-        <div class="mb-6">
-            <a href="{{ car.get_absolute_url }}" class="text-teal hover:text-teal-600 flex items-center space-x-2 mb-4">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <!-- Back Button -->
+        <div class="mb-8">
+            <a href="{{ car.get_absolute_url }}" class="inline-flex items-center text-teal hover:text-teal-600 transition-colors group">
+                <svg class="w-5 h-5 mr-2 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                 </svg>
-                <span>Back to Car Details</span>
+                <span class="font-semibold">Back to Car Details</span>
             </a>
-            <h1 class="text-3xl font-bold text-primary">Booking #{{ booking.id }}</h1>
-            <p class="text-gray-600">{{ car.title }}</p>
+        </div>
+
+        <!-- Header -->
+        <div class="mb-8">
+            <h1 class="text-4xl font-extrabold text-primary mb-2">Booking #{{ booking.id }}</h1>
+            <p class="text-xl text-gray-600">{{ car.title }}</p>
         </div>
         
         <!-- Free Gift Banner -->
         {% if show_free_gift_banner %}
-        <div class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white rounded-xl p-6 mb-6 shadow-lg">
+        <div class="bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-2xl p-6 mb-8 shadow-xl" data-aos="fade-down">
             <div class="flex items-center space-x-4">
-                <div class="text-5xl">🎁</div>
+                <div class="text-6xl">🎁</div>
                 <div>
-                    <h3 class="font-bold text-xl mb-1">FREE Gift Included!</h3>
-                    <p class="text-yellow-50">Complete your purchase and receive 5 litres of Premium Engine Oil absolutely FREE!</p>
+                    <h3 class="font-bold text-2xl mb-2">FREE Gift Included!</h3>
+                    <p class="text-white/90 text-lg">Complete your purchase and receive <strong>5 litres of Premium Engine Oil</strong> absolutely FREE!</p>
                 </div>
             </div>
         </div>
         {% endif %}
         
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
-            <!-- LEFT: Progress & Info -->
+            <!-- LEFT COLUMN: Progress & Vehicle Info -->
             <div class="lg:col-span-1 space-y-6">
                 
                 <!-- Progress Card -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="font-bold text-lg mb-4">Booking Progress</h3>
+                <div class="bg-white rounded-2xl shadow-lg p-6 border border-gray-100">
+                    <h3 class="font-bold text-xl mb-6 flex items-center text-primary">
+                        <svg class="w-6 h-6 mr-2 text-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        Booking Progress
+                    </h3>
                     
                     <!-- Progress Bar -->
-                    <div class="mb-6">
-                        <div class="flex justify-between items-center mb-2">
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-3">
                             <span class="text-sm font-semibold text-gray-700">{{ progress }}% Complete</span>
-                            <span class="text-sm font-bold text-teal">{{ booking.get_status_display }}</span>
+                            <span class="text-sm font-bold text-teal px-3 py-1 bg-teal/10 rounded-full">{{ booking.get_status_display }}</span>
                         </div>
-                        <div class="w-full bg-gray-200 rounded-full h-3">
-                            <div class="bg-gradient-to-r from-teal to-green-500 h-3 rounded-full transition-all duration-500"
+                        <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden">
+                            <div class="bg-gradient-to-r from-teal to-green-500 h-4 rounded-full transition-all duration-700 ease-out shadow-lg"
                                  style="width: {{ progress }}%"></div>
                         </div>
                     </div>
                     
-                    <!-- Steps -->
-                    <div class="space-y-3">
+                    <!-- Steps Timeline -->
+                    <div class="space-y-4">
                         {% for step_id, step_label in booking.BOOKING_STATUS_CHOICES %}
-                        <div class="flex items-center space-x-3 {% if booking.status == step_id %}text-teal font-semibold{% else %}text-gray-400{% endif %}">
-                            <div class="w-8 h-8 rounded-full flex items-center justify-center {% if booking.status == step_id %}bg-teal text-white{% else %}bg-gray-200{% endif %}">
-                                {% if step_id|slice:":1" != '❌' and step_id|slice:":1" != '✅' %}
-                                    {{ step_label|slice:":1" }}
-                                {% else %}
-                                    {{ step_label|slice:":2" }}
-                                {% endif %}
+                        <div class="flex items-center space-x-4 {% if booking.status == step_id %}text-teal{% else %}text-gray-400{% endif %} transition-all">
+                            <div class="w-10 h-10 rounded-full flex items-center justify-center font-bold shadow-sm
+                                {% if booking.status == step_id %}bg-gradient-to-br from-teal to-green-500 text-white ring-4 ring-teal/20{% else %}bg-gray-200{% endif %}">
+                                {{ forloop.counter }}
                             </div>
-                            <span class="text-sm">{{ step_label|slice:"2:" }}</span>
+                            <span class="text-sm font-semibold">{{ step_label }}</span>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
                 
-                <!-- Car Info Card -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="font-bold text-lg mb-4">Vehicle Details</h3>
+                <!-- Vehicle Card -->
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
                     {% if car.main_image %}
-                    <img src="{{ car.main_image.image.url }}" alt="{{ car.title }}"
-                         class="w-full h-40 object-cover rounded-lg mb-4">
+                    <div class="relative h-48 overflow-hidden">
+                        <img src="{{ car.main_image.image.url }}" alt="{{ car.title }}"
+                             class="w-full h-full object-cover">
+                        <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                    </div>
                     {% endif %}
-                    <h4 class="font-semibold text-primary mb-2">{{ car.title }}</h4>
-                    <div class="space-y-2 text-sm">
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Original Price:</span>
-                            <span class="font-semibold {% if booking.negotiated_price %}line-through text-gray-400{% endif %}">{{ car.formatted_price }}</span>
-                        </div>
-                        {% if booking.negotiated_price %}
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Negotiated Price:</span>
-                            <span class="font-bold text-green-600">{{ booking.formatted_final_price }}</span>
-                        </div>
-                        {% endif %}
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Year:</span>
-                            <span class="font-semibold">{{ car.year }}</span>
-                        </div>
-                        <div class="flex justify-between">
-                            <span class="text-gray-600">Condition:</span>
-                            <span class="font-semibold">{{ car.get_condition_display }}</span>
+                    
+                    <div class="p-6">
+                        <h3 class="font-bold text-lg mb-4 text-primary">Vehicle Details</h3>
+                        <h4 class="font-semibold text-gray-900 mb-4">{{ car.title }}</h4>
+                        
+                        <div class="space-y-3 text-sm">
+                            <div class="flex justify-between py-2 border-b border-gray-100">
+                                <span class="text-gray-600">Original Price:</span>
+                                <span class="font-semibold {% if booking.negotiated_price %}line-through text-gray-400{% endif %}">{{ car.formatted_price }}</span>
+                            </div>
+                            
+                            {% if booking.negotiated_price %}
+                            <div class="flex justify-between py-2 border-b border-gray-100 bg-green-50 -mx-6 px-6">
+                                <span class="text-gray-600 font-semibold">Negotiated Price:</span>
+                                <span class="font-bold text-green-600 text-lg">{{ booking.formatted_final_price }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="flex justify-between py-2 border-b border-gray-100">
+                                <span class="text-gray-600">Year:</span>
+                                <span class="font-semibold">{{ car.year }}</span>
+                            </div>
+                            
+                            <div class="flex justify-between py-2">
+                                <span class="text-gray-600">Condition:</span>
+                                <span class="font-semibold">{{ car.get_condition_display }}</span>
+                            </div>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Next Action -->
+                <!-- Next Action Card -->
                 {% if next_action.can_do and next_action.button_url %}
-                <div class="bg-blue-50 border-2 border-blue-500 rounded-xl p-6">
-                    <h3 class="font-bold text-lg text-blue-900 mb-2">{{ next_action.title }}</h3>
-                    <p class="text-blue-800 text-sm mb-4">{{ next_action.description }}</p>
+                <div class="bg-gradient-to-br from-blue-50 to-cyan-50 border-2 border-blue-500 rounded-2xl p-6 shadow-lg">
+                    <div class="flex items-start space-x-3 mb-4">
+                        <div class="w-12 h-12 bg-blue-500 text-white rounded-xl flex items-center justify-center flex-shrink-0">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-lg text-blue-900 mb-1">{{ next_action.title }}</h3>
+                            <p class="text-blue-800 text-sm">{{ next_action.description }}</p>
+                        </div>
+                    </div>
+                    
                     <a href="{{ next_action.button_url }}" 
-                       class="block w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold text-center transition">
+                       class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white py-4 rounded-xl font-semibold text-center transition-all transform hover:scale-105 shadow-md">
                         {{ next_action.button_text }}
                     </a>
                 </div>
                 {% endif %}
             </div>
             
-            <!-- RIGHT: Chat & Timeline -->
-            <div class="lg:col-span-2 space-y-6">
+            <!-- RIGHT COLUMN: Chat & Timeline -->
+            <div class="lg:col-span-2 space-y-8">
                 
                 <!-- Chat Box -->
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden">
-                    <div class="bg-gradient-to-r from-primary to-teal text-white p-4">
-                        <h3 class="font-bold text-lg flex items-center">
-                            <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-100">
+                    <!-- Chat Header -->
+                    <div class="bg-gradient-to-r from-primary via-[#0A2233] to-teal text-white p-6">
+                        <h3 class="font-bold text-2xl flex items-center mb-2">
+                            <svg class="w-7 h-7 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.4-4 8-9 8a10 10 0 01-4.3-.9L3 20l1.4-3.7A9 9 0 013 12c0-4.4 4-8 9-8s9 3.6 9 8z"></path>
                             </svg>
                             Chat with Us
                         </h3>
-                        <p class="text-sm text-white/80">Negotiate price, ask questions, get updates</p>
+                        <p class="text-sm text-white/80">Negotiate price, ask questions, and get real-time updates</p>
                     </div>
                     
-                    <!-- Messages -->
-                    <div id="chatMessages" class="p-4 space-y-4 max-h-96 overflow-y-auto bg-gray-50">
+                    <!-- Messages Area -->
+                    <div id="chatMessages" class="p-6 space-y-6 max-h-[500px] overflow-y-auto bg-gradient-to-b from-gray-50 to-white">
                         {% for message in messages %}
-                        <div class="flex {% if message.is_from_admin %}justify-start{% else %}justify-end{% endif %}">
-                            <div class="max-w-xs lg:max-w-md">
+                        <div class="flex {% if message.is_from_admin %}justify-start{% else %}justify-end{% endif %} animate-fade-in">
+                            <div class="max-w-lg">
                                 <!-- Sender Label -->
-                                <div class="text-xs text-gray-500 mb-1 {% if message.is_from_admin %}text-left{% else %}text-right{% endif %}">
-                                    {% if message.is_from_admin %}👨‍💼 Enoriel Team{% else %}You{% endif %}
+                                <div class="text-xs font-semibold mb-2 flex items-center {% if message.is_from_admin %}text-gray-600{% else %}text-teal{% endif %}">
+                                    {% if message.is_from_admin %}
+                                        <div class="w-6 h-6 bg-primary rounded-full flex items-center justify-center text-white text-xs mr-2">E</div>
+                                        Enoriel Team
+                                    {% else %}
+                                        You
+                                        <div class="w-6 h-6 bg-teal rounded-full flex items-center justify-center text-white text-xs ml-2">{{ message.booking.customer_name|slice:":1" }}</div>
+                                    {% endif %}
                                 </div>
                                 
                                 <!-- Message Bubble -->
-                                <div class="{% if message.is_from_admin %}bg-white border border-gray-200{% else %}bg-teal text-white{% endif %} rounded-2xl p-4 shadow-sm">
+                                <div class="{% if message.is_from_admin %}bg-white border-2 border-gray-200{% else %}bg-gradient-to-br from-teal to-green-500 text-white{% endif %} rounded-2xl p-5 shadow-md">
                                     {% if message.price_offer %}
-                                    <div class="bg-green-100 border-l-4 border-green-500 p-2 rounded mb-2">
-                                        <span class="text-xs font-semibold text-green-800">Price Offer:</span>
-                                        <span class="font-bold text-green-900 ml-2">₦{{ message.price_offer|floatformat:0|intcomma }}</span>
+                                    <div class="{% if message.is_from_admin %}bg-green-50 border-l-4 border-green-500{% else %}bg-white/20 border-l-4 border-white/50{% endif %} p-3 rounded-lg mb-3">
+                                        <span class="text-xs font-bold {% if message.is_from_admin %}text-green-800{% else %}text-white{% endif %} uppercase">Price Offer</span>
+                                        <div class="font-bold {% if message.is_from_admin %}text-green-900{% else %}text-white{% endif %} text-xl mt-1">₦{{ message.price_offer|floatformat:0|intcomma }}</div>
                                     </div>
                                     {% endif %}
                                     
-                                    <p class="text-sm whitespace-pre-wrap">{{ message.message }}</p>
+                                    <p class="text-sm leading-relaxed whitespace-pre-wrap">{{ message.message }}</p>
                                     
                                     {% if message.attachment %}
                                     <a href="{{ message.attachment.url }}" target="_blank" 
-                                       class="inline-flex items-center space-x-2 mt-2 text-xs text-blue-600 hover:text-blue-800">
+                                       class="inline-flex items-center space-x-2 mt-3 text-xs {% if message.is_from_admin %}text-blue-600 hover:text-blue-800{% else %}text-white/90 hover:text-white{% endif %} font-semibold">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
                                         </svg>
@@ -161,7 +194,7 @@
                                 </div>
                                 
                                 <!-- Timestamp -->
-                                <div class="text-xs text-gray-400 mt-1 {% if message.is_from_admin %}text-left{% else %}text-right{% endif %}">
+                                <div class="text-xs text-gray-400 mt-2 {% if message.is_from_admin %}text-left{% else %}text-right{% endif %}">
                                     {{ message.created_at|date:"M d, g:i A" }}
                                 </div>
                             </div>
@@ -170,64 +203,84 @@
                     </div>
                     
                     <!-- Message Input -->
-                    <form method="POST" class="border-t border-gray-200 p-4 bg-white">
+                    <form method="POST" class="border-t border-gray-200 p-6 bg-white">
                         {% csrf_token %}
                         
-                        <!-- Optional: Price Offer -->
-                        <div class="mb-3">
-                            <label class="text-xs font-semibold text-gray-700 mb-1 block">💰 Include Price Offer (Optional)</label>
+                        <!-- Price Offer Input -->
+                        <div class="mb-4">
+                            <label class="text-sm font-bold text-gray-700 mb-2 flex items-center">
+                                <span class="text-2xl mr-2">💰</span>
+                                Include Price Offer (Optional)
+                            </label>
                             <input type="number" name="price_offer" 
-                                   class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent text-sm"
-                                   placeholder="e.g., 5000000" step="1000">
+                                   class="w-full px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-teal focus:border-teal transition-all text-lg"
+                                   placeholder="e.g., 5,000,000" step="1000">
                         </div>
                         
-                        <!-- Message -->
-                        <div class="flex space-x-2">
+                        <!-- Message Input -->
+                        <div class="flex space-x-3">
                             <textarea name="message" rows="2" required
-                                      class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal focus:border-transparent resize-none"
+                                      class="flex-1 px-4 py-3 border-2 border-gray-300 rounded-xl focus:ring-2 focus:ring-teal focus:border-teal transition-all resize-none"
                                       placeholder="Type your message..."></textarea>
                             <button type="submit" 
-                                    class="bg-teal hover:bg-teal-600 text-white px-6 rounded-lg font-semibold transition">
+                                    class="bg-gradient-to-r from-teal to-green-500 hover:from-teal-600 hover:to-green-600 text-white px-8 rounded-xl font-semibold transition-all transform hover:scale-105 shadow-lg flex items-center justify-center">
                                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                                 </svg>
                             </button>
                         </div>
                         
-                        <p class="text-xs text-gray-500 mt-2">
-                            💡 Tip: Include a price offer to start negotiating!
+                        <p class="text-xs text-gray-500 mt-3 flex items-center">
+                            <svg class="w-4 h-4 mr-1 text-teal" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+                            </svg>
+                            Tip: Include a price offer to start negotiating!
                         </p>
                     </form>
                 </div>
                 
-                <!-- Timeline -->
-                <div class="bg-white rounded-xl shadow-lg p-6">
-                    <h3 class="font-bold text-xl mb-6 flex items-center">
-                        <svg class="w-6 h-6 text-teal mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <!-- Activity Timeline -->
+                <div class="bg-white rounded-2xl shadow-lg p-8 border border-gray-100">
+                    <h3 class="font-bold text-2xl mb-8 flex items-center text-primary">
+                        <svg class="w-7 h-7 text-teal mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                         Activity Timeline
                     </h3>
                     
-                    <div class="space-y-4">
+                    <div class="space-y-6">
                         {% for activity in activities %}
-                        <div class="flex items-start space-x-4">
-                            <div class="flex-shrink-0">
-                                <div class="w-10 h-10 bg-teal text-white rounded-full flex items-center justify-center font-bold">
-                                    ✓
+                        <div class="flex items-start space-x-4 relative">
+                            <!-- Timeline Line -->
+                            {% if not forloop.last %}
+                            <div class="absolute left-5 top-12 bottom-0 w-0.5 bg-gradient-to-b from-teal to-gray-200"></div>
+                            {% endif %}
+                            
+                            <!-- Icon -->
+                            <div class="flex-shrink-0 relative z-10">
+                                <div class="w-11 h-11 bg-gradient-to-br from-teal to-green-500 text-white rounded-full flex items-center justify-center font-bold shadow-lg ring-4 ring-teal/20">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                    </svg>
                                 </div>
                             </div>
                             
-                            <div class="flex-1 {% if not forloop.last %}pb-6 border-l-2 border-gray-200 pl-6 ml-5{% endif %}">
-                                <div class="bg-gray-50 rounded-lg p-4">
-                                    <h4 class="font-semibold text-primary mb-1">{{ activity.title }}</h4>
+                            <!-- Content -->
+                            <div class="flex-1 pb-8">
+                                <div class="bg-gradient-to-br from-gray-50 to-white rounded-xl p-5 border border-gray-200 shadow-sm hover:shadow-md transition-shadow">
+                                    <h4 class="font-bold text-primary mb-2 text-lg">{{ activity.title }}</h4>
                                     {% if activity.description %}
-                                    <p class="text-gray-600 text-sm mb-2">{{ activity.description }}</p>
+                                    <p class="text-gray-600 text-sm mb-3 leading-relaxed">{{ activity.description }}</p>
                                     {% endif %}
                                     <div class="flex items-center space-x-4 text-xs text-gray-500">
-                                        <span>{{ activity.created_at|date:"M d, Y • g:i A" }}</span>
+                                        <span class="flex items-center">
+                                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
+                                            {{ activity.created_at|date:"M d, Y • g:i A" }}
+                                        </span>
                                         <span>•</span>
-                                        <span>By {{ activity.performed_by }}</span>
+                                        <span class="font-semibold">By {{ activity.performed_by }}</span>
                                     </div>
                                 </div>
                             </div>
@@ -240,8 +293,14 @@
     </div>
 </div>
 
+<style>
+    /* Add this class to your booking_detail.html body tag: <body class="booking-detail-page"> */
+.booking-detail-page .messages {
+    display: none !important;
+}
+</style>
 
-<!-- Auto-scroll chat to bottom -->
+<!-- Auto-scroll chat and poll for updates -->
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const chatDiv = document.getElementById('chatMessages');
