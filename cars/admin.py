@@ -368,7 +368,7 @@ class CarBookingAdmin(admin.ModelAdmin):
     
     def booking_id(self, obj):
         return format_html(
-            '<a href="/admin/cars/carbooking/{}/change/" style="font-weight: bold;">#{}</a>',
+            '<a href="/Enoriel-administrator/cars/carbooking/{}/change/" style="font-weight: bold;">#{}</a>',
             obj.id, obj.id
         )
     booking_id.short_description = 'ID'
@@ -445,7 +445,7 @@ class CarBookingAdmin(admin.ModelAdmin):
     def send_message_to_selected(self, request, queryset):
         """Open page to send message to selected bookings"""
         selected = queryset.values_list('id', flat=True)
-        return redirect(f'/admin/send-bulk-message/?ids={",".join(map(str, selected))}')
+        return redirect(f'/Enoriel-administrator/send-bulk-message/?ids={",".join(map(str, selected))}')
     send_message_to_selected.short_description = '💬 Send Message to Selected'
     
     def advance_to_inspection(self, request, queryset):
